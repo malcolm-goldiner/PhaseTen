@@ -10,12 +10,28 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello, World!")
+        CardView(card: Phase10Card(.one, color: .red))
+    }
+}
+
+struct CardView: View {
+    @State var card: Phase10Card
+    
+    var backgroundColor: UIColor {
+        return card.color ?? .white
+    }
+    
+    var body: some View {
+        HStack {
+            Text("\(card.type.value())")
+                .font(.system(size: 360))
+                .foregroundColor(Color(card.color ?? .white))
+        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        CardView(card: Phase10Card(.one, color: .red))
     }
 }
