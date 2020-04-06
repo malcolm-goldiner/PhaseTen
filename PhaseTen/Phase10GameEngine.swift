@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum Phase: Equatable {
+enum Phase: Equatable, Hashable {
     static func == (lhs: Phase, rhs: Phase) -> Bool {
         return lhs.requirements() == rhs.requirements() && lhs.name() == rhs.name()
     }
@@ -26,8 +26,6 @@ enum Phase: Equatable {
              .nine(let requirements),
              .ten(let requirements):
             return requirements
-        default:
-            return nil
         }
     }
     
@@ -56,6 +54,11 @@ enum Phase: Equatable {
         }
     }
     
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name())
+        hasher.combine(requirements())
+    }
+    
     case one(requirements: [ValidatedCombo])
     case two(requirements: [ValidatedCombo])
     case three(requirements: [ValidatedCombo])
@@ -69,16 +72,16 @@ enum Phase: Equatable {
     
 }
 
-indirect enum ValidatedCombo: Equatable {
+indirect enum ValidatedCombo: Equatable, Hashable {
     case setOf(count: Int)
-    case runOf(coun: Int)
+    case runOf(count: Int)
     case numberOfColor(count: Int)
     case numberOf(count:Int, combos: ValidatedCombo)
     
-    func valid(fromCards cards: [Phase10Card]) -> (Bool, Phase10CardType?) {
+    func valid(fromCards cards: [Phase10Card], combo: ValidatedCombo? = nil) -> (Bool, Phase10CardType?) {
         switch self {
         case .setOf(let count):
-            let sorted = cards.sorted(by: { (a: Phase10Card , b: Phase10Card) in a.type.rawValue < b.type.rawValue }).filter { $0.type.value() > 12}
+            let sorted = cards.sorted(by: { (a: Phase10Card , b: Phase10Card) in a.type.rawValue < b.type.rawValue }).filter { $0.type.value() > Phase10CardType.maxFaceCardValue}
             
             var runningCount = 1
             var currentCard = sorted.first?.type
@@ -95,8 +98,8 @@ indirect enum ValidatedCombo: Equatable {
                     return (true, currentCard)
                 }
             }
-        case .runOf(coun: let count):
-            let sorted = Array(Set(cards)).sorted(by: { (a: Phase10Card , b: Phase10Card) in a.type.rawValue < b.type.rawValue }).filter { $0.type.value() > 12}
+        case .runOf(count: let count):
+            let sorted = Array(Set(cards)).sorted(by: { (a: Phase10Card , b: Phase10Card) in a.type.rawValue < b.type.rawValue }).filter { $0.type.value() > Phase10CardType.maxFaceCardValue}
             
             for i in 0..<sorted.count {
                 var runningCount = 1
@@ -115,13 +118,13 @@ indirect enum ValidatedCombo: Equatable {
             }
         case.numberOfColor(let count):
             let uniqueColors = Array(Set(cards.map { $0.color }))
-            return (uniqueColors.map { (color) in cards.filter {$0.color == color}.count }.contains(count), nil)
+            return (uniqueColors.map { (color) in cards.filter { $0.color == color }.count }.contains(count), nil)
             
         case .numberOf(let count, let combo):
             var updatedCards = cards
             var result = false
             for _ in 0..<count {
-                let overallLastResult = valid(fromCards: updatedCards)
+                let overallLastResult = combo.valid(fromCards: updatedCards)
                 result = overallLastResult.0
                 
                 if !result {
@@ -130,7 +133,7 @@ indirect enum ValidatedCombo: Equatable {
                 
                 let lastType = overallLastResult.1
                 
-                updatedCards.removeAll(where: { $0.type == lastType})
+                updatedCards.removeAll(where: { $0.type == lastType })
             }
             
             return (result, nil)
@@ -142,44 +145,86 @@ indirect enum ValidatedCombo: Equatable {
 
 
 
-class Phase10Player {
+class Phase10Player: Equatable, Hashable {
+    
+    static func == (lhs: Phase10Player, rhs: Phase10Player) -> Bool {
+        return lhs.hand == rhs.hand && lhs.phase == rhs.phase
+    }
+    
+    var name: String?
     
     var hand: [Phase10Card] = []
     
     var phase: Phase? =  Phase10GameEngine.generalReqs.first
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(hand)
+        hasher.combine(phase)
+    }
 }
 
 class Phase10GameEngine {
     
+    static let shared = Phase10GameEngine()
+    
+    private static let handSize = 10
+    
+    private static let maxPlayers = 6
+    
     static let generalReqs: [Phase] = [
         .one(requirements:[.numberOf(count: 2, combos: .setOf(count: 3))]),
-        .two(requirements: [.setOf(count: 3), .runOf(coun: 4)]),
-        .three(requirements: [.setOf(count: 4), .runOf(coun: 4)]),
-        .four(requirements: [.runOf(coun: 7)]),
-        .five(requirements: [.runOf(coun: 8)]),
-        .six(requirements: [.runOf(coun: 9)]),
+        .two(requirements: [.setOf(count: 3), .runOf(count: 4)]),
+        .three(requirements: [.setOf(count: 4), .runOf(count: 4)]),
+        .four(requirements: [.runOf(count: 7)]),
+        .five(requirements: [.runOf(count: 8)]),
+        .six(requirements: [.runOf(count: 9)]),
         .seven(requirements: [.numberOf(count: 2, combos: .setOf(count: 4))]),
         .eight(requirements: [.numberOfColor(count: 7)]),
         .nine(requirements: [.setOf(count: 5), .setOf(count: 2)]),
         .ten(requirements: [.setOf(count: 5), .setOf(count: 2)])
     ]
     
-    
     var deck = Phase10Deck()
     
     var discardPile = [Phase10Card]()
     
-    var players: [Phase10Player]
+    var players = [Phase10Player]()
+    
+    var scoresByPlayer = [Phase10Player: Int]()
+    
+    var winningPlayer: Phase10Player?
+    
+    init() {
+        players.forEach { player in
+            beginRoundForPlayer(player)
+        }
+    }
     
     func movePlayerToNextPhase(_ player: Phase10Player) {
         if let phase = player.phase {
             switch phase {
             case .nine(_):
                 print("GAME OVER")
+                
+                for (player, score) in scoresByPlayer {
+                    print("\(String(describing: player.name)): \(score)")
+                }
             default:
                 if let index = Phase10GameEngine.generalReqs.firstIndex(where: { $0 == phase }) {
                     player.phase = Phase10GameEngine.generalReqs[index + 1]
                 }
+            }
+        }
+    }
+    
+    func beginNewRound() {
+        for player in players {
+            discardPile.insert(contentsOf: player.hand, at: 0)
+            player.hand = []
+            beginRoundForPlayer(player)
+            
+            if player != winningPlayer {
+                scoresByPlayer[player, default: 0] += player.hand.reduce(0) { $0 + $1.type.rawValue }
             }
         }
     }
@@ -195,16 +240,25 @@ class Phase10GameEngine {
     }
     
     func addPlayer() {
-        guard players.count > 5 else {
+        guard players.count < Phase10GameEngine.maxPlayers - 1 else {
             print("Can't add anymore players")
+            return
         }
         
         let newPlayer = Phase10Player()
-        newPlayer.phase = Phase10GameEngine.generalReqs.first
-        newPlayer.hand.append(contentsOf: deck.cards.dropFirst(10))
+        players.append(newPlayer)
+        beginRoundForPlayer(newPlayer)
     }
     
-    func validatePhase(for player: Phase10Player) -> Bool {
+    private func beginRoundForPlayer(_ player: Phase10Player) {
+        if player.phase == nil {
+            player.phase = Phase10GameEngine.generalReqs.first
+        }
+        
+        player.hand.append(contentsOf: deck.cards[0...9])
+    }
+    
+    func validatePhase(for player: Phase10Player, playedCards: [Phase10Card]) -> Bool {
         var result = false
         
         switch player.phase {
@@ -218,13 +272,15 @@ class Phase10GameEngine {
              .eight(let requirements),
              .nine(let requirements),
              .ten(let requirements):
-            result =  requirements.reduce(true) { $0 && $1.valid(fromCards: player.hand).0 }
+            result =  requirements.reduce(true) { $0 && $1.valid(fromCards: playedCards).0 }
         default:
             result =  false
         }
         
         if result {
             movePlayerToNextPhase(player)
+            discardPile.append(contentsOf: playedCards)
+            winningPlayer = player
         }
         
         return result

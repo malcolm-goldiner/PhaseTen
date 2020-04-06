@@ -30,6 +30,17 @@ struct CardView: View {
     }
 }
 
+struct HandView {
+      @State var hand: [Phase10Card]
+      
+      
+      var body: some View {
+        HStack {
+            CardView(card: hand.first!)
+        }
+      }
+}
+
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         CardView(card: Phase10Card(.one, color: .red))

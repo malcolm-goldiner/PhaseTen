@@ -24,10 +24,13 @@ enum Phase10CardType: Int, CaseIterable {
     case skip
     case wild
     
+    static let maxFaceCardValue = 12
+    
     func value() -> Int {
-        if rawValue < 12 {
+        if rawValue < Phase10CardType.maxFaceCardValue {
             return rawValue + 1
         } else {
+            // wild and skip have the same value
             return 20
         }
     }
