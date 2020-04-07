@@ -34,6 +34,19 @@ enum Phase10CardType: Int, CaseIterable {
             return 20
         }
     }
+    
+    func displayValue() -> String {
+          if rawValue < Phase10CardType.maxFaceCardValue {
+              return "\(rawValue + 1)"
+          } else if self == .wild {
+              // wild and skip have the same value
+              return "Wild"
+          } else if self == .skip {
+            return "Skip"
+        }
+        
+        return ""
+      }
 }
 
 
@@ -43,7 +56,7 @@ class Phase10Card: Hashable, Equatable {
         return lhs.type == rhs.type && lhs.color == rhs.color
     }
     
-    static let cardColors: [UIColor] = [.red, .blue, .yellow, .green]
+    static let cardColors: [UIColor] = [.red, .blue, .orange, .green]
     
     let type: Phase10CardType
     
@@ -51,7 +64,7 @@ class Phase10Card: Hashable, Equatable {
     
     init(_ type: Phase10CardType, color: UIColor? = nil) {
         self.type = type
-        self.color = color
+        self.color = color ?? .black // default for wild and skip
     }
     
     func hash(into hasher: inout Hasher) {
@@ -62,7 +75,7 @@ class Phase10Card: Hashable, Equatable {
 
 class Phase10Deck {
     
-    let cards: [Phase10Card]
+    var cards: [Phase10Card]
     
     init() {
         var buildingCards = [Phase10Card]()

@@ -1,32 +1,34 @@
 //
-//  CardCollectionViewCell.swift
+//  CardView.swift
 //  PhaseTen
 //
-//  Created by Malcolm Goldiner on 4/5/20.
+//  Created by Malcolm Goldiner on 4/6/20.
 //  Copyright © 2020 Malcolm Goldiner. All rights reserved.
 //
 
 import UIKit
 
-class CardCollectionViewCell: UICollectionViewCell {
+class CardView: UIView {
     
-    static let reuseIdenitifer = "handCell"
+    @IBOutlet weak var cardTypeLabel: UILabel!
     
     static let nibName = "CardCell"
 
-    @IBOutlet weak var cardView: CardView!
-    
     var card: Phase10Card? {
         didSet {
             guard let card = card else {
-                return 
+                return
             }
             
-            cardView.card = card 
+            cardTypeLabel.text = card.type.displayValue()
+            cardTypeLabel.textColor = .white
+            
+            backgroundColor = card.color
         }
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
+    
 }

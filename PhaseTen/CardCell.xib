@@ -16,21 +16,36 @@
                 <rect key="frame" x="0.0" y="0.0" width="233" height="373"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DHQ-MP-DPH">
-                        <rect key="frame" x="95.5" y="176" width="42" height="21"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xQD-Z0-Q2H" customClass="CardView" customModule="PhaseTen" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="233" height="373"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Fk-zs-KXz">
+                                <rect key="frame" x="95.5" y="176" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="5Fk-zs-KXz" firstAttribute="centerY" secondItem="xQD-Z0-Q2H" secondAttribute="centerY" id="EdU-hW-YYd"/>
+                            <constraint firstItem="5Fk-zs-KXz" firstAttribute="centerX" secondItem="xQD-Z0-Q2H" secondAttribute="centerX" id="PuN-Vh-1eR"/>
+                        </constraints>
+                        <connections>
+                            <outlet property="cardTypeLabel" destination="5Fk-zs-KXz" id="o4T-4v-kYy"/>
+                        </connections>
+                    </view>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="DHQ-MP-DPH" firstAttribute="centerY" secondItem="0GC-FY-qgf" secondAttribute="centerY" id="66m-fD-aQz"/>
-                    <constraint firstItem="DHQ-MP-DPH" firstAttribute="centerX" secondItem="0GC-FY-qgf" secondAttribute="centerX" id="SHZ-wy-bek"/>
+                    <constraint firstItem="xQD-Z0-Q2H" firstAttribute="leading" secondItem="0GC-FY-qgf" secondAttribute="leading" id="5xa-Nk-pWK"/>
+                    <constraint firstAttribute="trailing" secondItem="xQD-Z0-Q2H" secondAttribute="trailing" id="LWc-jC-ZLz"/>
+                    <constraint firstItem="xQD-Z0-Q2H" firstAttribute="top" secondItem="0GC-FY-qgf" secondAttribute="top" id="fkX-8p-hS4"/>
+                    <constraint firstAttribute="bottom" secondItem="xQD-Z0-Q2H" secondAttribute="bottom" id="kl5-AF-hMP"/>
                 </constraints>
             </collectionViewCellContentView>
             <size key="customSize" width="233" height="373"/>
             <connections>
-                <outlet property="cardTypeLabel" destination="DHQ-MP-DPH" id="7NC-Eq-E2T"/>
+                <outlet property="cardView" destination="xQD-Z0-Q2H" id="tOa-mv-uC0"/>
             </connections>
             <point key="canvasLocation" x="367.39130434782612" y="623.77232142857144"/>
         </collectionViewCell>

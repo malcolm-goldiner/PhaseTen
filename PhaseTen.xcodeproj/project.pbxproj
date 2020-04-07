@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		1F7BD7632436DA820083854B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD7622436DA820083854B /* AppDelegate.swift */; };
-		1F7BD7672436DA820083854B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD7662436DA820083854B /* ContentView.swift */; };
 		1F7BD7692436DA850083854B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F7BD7682436DA850083854B /* Assets.xcassets */; };
 		1F7BD76C2436DA850083854B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F7BD76B2436DA850083854B /* Preview Assets.xcassets */; };
 		1F7BD76F2436DA850083854B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F7BD76D2436DA850083854B /* LaunchScreen.storyboard */; };
@@ -19,12 +18,15 @@
 		1F7BD77F2439CDC40083854B /* CardCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD77E2439CDC40083854B /* CardCollectionViewCell.swift */; };
 		1F7BD781243AAAB40083854B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F7BD780243AAAB40083854B /* Main.storyboard */; };
 		1F7BD7A3243AABEF0083854B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD7A2243AABEF0083854B /* SceneDelegate.swift */; };
+		1F7BD7A5243B0BD40083854B /* Phase10GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD7A4243B0BD40083854B /* Phase10GameViewController.swift */; };
+		1F7BD7A7243C445E0083854B /* Phase10BackingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD7A6243C445E0083854B /* Phase10BackingModels.swift */; };
+		1F7BD7A9243C47B00083854B /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD7A8243C47B00083854B /* CardView.swift */; };
+		1F7BD7AB243C49780083854B /* CardView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F7BD7AA243C49780083854B /* CardView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1F7BD75F2436DA820083854B /* PhaseTen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhaseTen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F7BD7622436DA820083854B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		1F7BD7662436DA820083854B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1F7BD7682436DA850083854B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1F7BD76B2436DA850083854B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1F7BD76E2436DA850083854B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -36,6 +38,10 @@
 		1F7BD77E2439CDC40083854B /* CardCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCollectionViewCell.swift; sourceTree = "<group>"; };
 		1F7BD780243AAAB40083854B /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		1F7BD7A2243AABEF0083854B /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = ../../Test/Test/SceneDelegate.swift; sourceTree = "<group>"; };
+		1F7BD7A4243B0BD40083854B /* Phase10GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase10GameViewController.swift; sourceTree = "<group>"; };
+		1F7BD7A6243C445E0083854B /* Phase10BackingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase10BackingModels.swift; sourceTree = "<group>"; };
+		1F7BD7A8243C47B00083854B /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		1F7BD7AA243C49780083854B /* CardView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CardView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,12 +77,15 @@
 				1F7BD7622436DA820083854B /* AppDelegate.swift */,
 				1F7BD780243AAAB40083854B /* Main.storyboard */,
 				1F7BD7A2243AABEF0083854B /* SceneDelegate.swift */,
-				1F7BD7662436DA820083854B /* ContentView.swift */,
 				1F7BD7762436DE0E0083854B /* Phase10Card.swift */,
 				1F7BD77A2439CD120083854B /* ActiveHandControllerCollectionViewController.swift */,
+				1F7BD7A4243B0BD40083854B /* Phase10GameViewController.swift */,
 				1F7BD77E2439CDC40083854B /* CardCollectionViewCell.swift */,
+				1F7BD7A8243C47B00083854B /* CardView.swift */,
 				1F7BD77B2439CD120083854B /* CardCell.xib */,
+				1F7BD7AA243C49780083854B /* CardView.xib */,
 				1F7BD7782439A95B0083854B /* Phase10GameEngine.swift */,
+				1F7BD7A6243C445E0083854B /* Phase10BackingModels.swift */,
 				1F7BD7682436DA850083854B /* Assets.xcassets */,
 				1F7BD76D2436DA850083854B /* LaunchScreen.storyboard */,
 				1F7BD7702436DA850083854B /* Info.plist */,
@@ -153,6 +162,7 @@
 			files = (
 				1F7BD76F2436DA850083854B /* LaunchScreen.storyboard in Resources */,
 				1F7BD781243AAAB40083854B /* Main.storyboard in Resources */,
+				1F7BD7AB243C49780083854B /* CardView.xib in Resources */,
 				1F7BD76C2436DA850083854B /* Preview Assets.xcassets in Resources */,
 				1F7BD7692436DA850083854B /* Assets.xcassets in Resources */,
 				1F7BD77D2439CD120083854B /* CardCell.xib in Resources */,
@@ -169,9 +179,11 @@
 				1F7BD7792439A95B0083854B /* Phase10GameEngine.swift in Sources */,
 				1F7BD7A3243AABEF0083854B /* SceneDelegate.swift in Sources */,
 				1F7BD7772436DE0E0083854B /* Phase10Card.swift in Sources */,
+				1F7BD7A7243C445E0083854B /* Phase10BackingModels.swift in Sources */,
+				1F7BD7A9243C47B00083854B /* CardView.swift in Sources */,
 				1F7BD7632436DA820083854B /* AppDelegate.swift in Sources */,
 				1F7BD77F2439CDC40083854B /* CardCollectionViewCell.swift in Sources */,
-				1F7BD7672436DA820083854B /* ContentView.swift in Sources */,
+				1F7BD7A5243B0BD40083854B /* Phase10GameViewController.swift in Sources */,
 				1F7BD77C2439CD120083854B /* ActiveHandControllerCollectionViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
