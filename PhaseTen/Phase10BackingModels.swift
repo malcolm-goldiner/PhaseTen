@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Combine
 
 enum Phase: Equatable, Hashable {
     static func == (lhs: Phase, rhs: Phase) -> Bool {
@@ -153,10 +154,13 @@ class Phase10Player: Equatable, Hashable {
     
     var name: String?
     
+    @Published
     var hand: [Phase10Card] = []
     
+    @Published
     var potentialSets: [Phase10Card] = []
     
+    @Published
     var phase: Phase? =  Phase10GameEngine.generalReqs.first
     
     func hash(into hasher: inout Hasher) {

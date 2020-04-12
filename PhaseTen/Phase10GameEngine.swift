@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import Combine
 
 class Phase10GameEngine {
     
@@ -30,14 +30,19 @@ class Phase10GameEngine {
         .ten(requirements: [.setOf(count: 5), .setOf(count: 2)])
     ]
     
+    @Published
     var deck = Phase10Deck()
     
+    @Published
     var discardPile = [Phase10Card]()
     
+    @Published
     var players = [Phase10Player]()
     
+    @Published
     var scoresByPlayer = [Phase10Player: Int]()
     
+    @Published
     var winningPlayer: Phase10Player?
     
     init() {

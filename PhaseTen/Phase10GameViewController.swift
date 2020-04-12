@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class Phase10GameViewController: UIViewController {
     
@@ -20,11 +21,63 @@ class Phase10GameViewController: UIViewController {
     
     @IBOutlet weak var currentHandCollectionView: UICollectionView!
     
-    var player: Phase10Player?
+    var needsReload: Bool = false {
+        didSet {
+            if needsReload {
+                currentHandCollectionView.reloadData()
+                potentialCardSetCollectionView.reloadData()
+            }
+        }
+    }
+    
+    var player: Phase10Player? {
+        didSet {
+            currentHandCollectionView.reloadData()
+            potentialCardSetCollectionView.reloadData()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupCollectionViews()
+        startGame()
+        listenForGameStateChanges()
+    }
+    
+    private func listenForGameStateChanges() {
+        let scoreSubscriber = Subscribers.Assign(object: scoreLabel, keyPath: \.text)
+        Phase10GameEngine.shared.$scoresByPlayer.map { [weak self] scoreDict in
+            if let player = self?.player,
+                let currentScore = scoreDict[player] {
+                return "Score: \(currentScore)"
+            }
+            
+            return "Score: 0"
+        }.subscribe(scoreSubscriber)
+        
+        let discardPileSubscriber = Subscribers.Assign(object: topOfPileCardView, keyPath: \.card)
+        Phase10GameEngine.shared.$discardPile.map { $0.last }.subscribe(discardPileSubscriber)
+        
+        
+        _ = player?.$hand.sink(receiveValue: { [weak self] _ in
+            self?.needsReload = true
+        })
+    
+        _ = player?.$potentialSets.sink(receiveValue: { [weak self] _ in
+            self?.needsReload = true
+        })
+    }
+    
+    
+    private func startGame() {
+        Phase10GameEngine.shared.addPlayer()
+        player = Phase10GameEngine.shared.players.first
+        currentHandCollectionView.reloadData()
+        
+    }
+    
+    private func setupCollectionViews() {
         self.currentHandCollectionView!.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
         
         self.potentialCardSetCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
@@ -34,13 +87,6 @@ class Phase10GameViewController: UIViewController {
         
         potentialCardSetCollectionView.delegate = self
         potentialCardSetCollectionView.dataSource = self
-        
-        
-        Phase10GameEngine.shared.addPlayer()
-        player = Phase10GameEngine.shared.players.first
-        currentHandCollectionView.reloadData()
-        
-        topOfPileCardView.card = Phase10GameEngine.shared.discardPile.last
     }
     
 }
