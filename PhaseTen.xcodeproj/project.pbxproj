@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1F08F2DE2442DBC8002CD470 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */; };
+		1F5B5518244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */; };
+		1F5B551A244EBE720045F5F5 /* Phase10GameViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */; };
 		1F7BD7632436DA820083854B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD7622436DA820083854B /* AppDelegate.swift */; };
 		1F7BD7692436DA850083854B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F7BD7682436DA850083854B /* Assets.xcassets */; };
 		1F7BD76C2436DA850083854B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F7BD76B2436DA850083854B /* Preview Assets.xcassets */; };
@@ -25,6 +27,8 @@
 
 /* Begin PBXFileReference section */
 		1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Phase10GameViewController+DragandDrop.swift"; sourceTree = "<group>"; };
+		1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase10GameViewDataSource.swift; sourceTree = "<group>"; };
 		1F7BD75F2436DA820083854B /* PhaseTen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhaseTen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F7BD7622436DA820083854B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1F7BD7682436DA850083854B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -77,6 +81,8 @@
 				1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */,
 				1F7BD7762436DE0E0083854B /* Phase10Card.swift */,
 				1F7BD7A4243B0BD40083854B /* Phase10GameViewController.swift */,
+				1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */,
+				1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */,
 				1F7BD77E2439CDC40083854B /* CardCollectionViewCell.swift */,
 				1F7BD7A8243C47B00083854B /* CardView.swift */,
 				1F7BD77B2439CD120083854B /* CardCell.xib */,
@@ -176,8 +182,10 @@
 				1F7BD7792439A95B0083854B /* Phase10GameEngine.swift in Sources */,
 				1F08F2DE2442DBC8002CD470 /* SceneDelegate.swift in Sources */,
 				1F7BD7772436DE0E0083854B /* Phase10Card.swift in Sources */,
+				1F5B5518244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift in Sources */,
 				1F7BD7A7243C445E0083854B /* Phase10BackingModels.swift in Sources */,
 				1F7BD7A9243C47B00083854B /* CardView.swift in Sources */,
+				1F5B551A244EBE720045F5F5 /* Phase10GameViewDataSource.swift in Sources */,
 				1F7BD7632436DA820083854B /* AppDelegate.swift in Sources */,
 				1F7BD77F2439CDC40083854B /* CardCollectionViewCell.swift in Sources */,
 				1F7BD7A5243B0BD40083854B /* Phase10GameViewController.swift in Sources */,
