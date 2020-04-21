@@ -76,6 +76,21 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
         }
     }
     
+    func acceptDraggedCard(_ card: Phase10Card, to destinationIndex: Int?) {
+        guard let player = player else {
+            return
+        }
+        
+        switch deckType {
+        case .set:
+            player.potentialSets.append(card)
+            player.hand = player.hand.filter { $0 != card }
+        case .hand:
+            player.hand.append(card)
+            player.potentialSets = player.potentialSets.filter { $0 != card }
+        }
+    }
+    
     
 }
 
@@ -90,6 +105,8 @@ class Phase10GameViewController: UIViewController {
     @IBOutlet weak var potentialCardSetCollectionView: UICollectionView!
     
     @IBOutlet weak var currentHandCollectionView: UICollectionView!
+    
+    @IBOutlet weak var takeCardButton: UIButton!
     
     var needsReload: Bool = false {
         didSet {
@@ -118,6 +135,14 @@ class Phase10GameViewController: UIViewController {
         listenForGameStateChanges()
     }
     
+    @IBAction func takeCardPressed(_ sender: UIButton) {
+        guard let player = player else {
+            return
+        }
+        
+        Phase10GameEngine.shared.pickFromDiscardPile(player: player)
+    }
+    
     private func listenForGameStateChanges() {
         let scoreSubscriber = Subscribers.Assign(object: scoreLabel, keyPath: \.text)
         Phase10GameEngine.shared.$scoresByPlayer.map { [weak self] scoreDict in
@@ -132,14 +157,11 @@ class Phase10GameViewController: UIViewController {
         let discardPileSubscriber = Subscribers.Assign(object: topOfPileCardView, keyPath: \.card)
         Phase10GameEngine.shared.$discardPile.map { $0.last }.subscribe(discardPileSubscriber)
         
+        let handSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
+        player?.$hand.map { !$0.isEmpty }.subscribe(handSubscriber)
         
-        _ = player?.$hand.sink(receiveValue: { [weak self] _ in
-            self?.needsReload = true
-        })
-        
-        _ = player?.$potentialSets.sink(receiveValue: { [weak self] _ in
-            self?.needsReload = true
-        })
+        let setSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
+        player?.$potentialSets.map { !$0.isEmpty }.subscribe(setSubscriber)
     }
     
     
@@ -150,8 +172,6 @@ class Phase10GameViewController: UIViewController {
         setDataSource = Phase10GameViewDataSource(deckType: .set, game: Phase10GameEngine.shared)
         
         setupCollectionViews()
-        currentHandCollectionView.reloadData()
-        potentialCardSetCollectionView.reloadData()
     }
     
     private func setupCollectionViews() {
@@ -161,9 +181,11 @@ class Phase10GameViewController: UIViewController {
         
         currentHandCollectionView.delegate = self
         currentHandCollectionView.dataSource = handDataSource
+        currentHandCollectionView.dragInteractionEnabled = true
         
         potentialCardSetCollectionView.delegate = self
         potentialCardSetCollectionView.dataSource = setDataSource
+        potentialCardSetCollectionView.dragInteractionEnabled = true
         
         currentHandCollectionView.dragDelegate = self
         currentHandCollectionView.dropDelegate = self
@@ -180,25 +202,20 @@ class Phase10GameViewController: UIViewController {
 extension Phase10GameViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-           guard let dataSource = collectionView.dataSource as? Phase10GameViewDataSource,
-               dataSource.cardAt(indexPath) != nil else {
-               return
-           }
-           
-           dataSource.moveCard(at: indexPath.row, to: nil)
-           currentHandCollectionView.reloadData()
-           potentialCardSetCollectionView.reloadData()
-       }
-    
+        guard let dataSource = collectionView.dataSource as? Phase10GameViewDataSource,
+            let card = dataSource.cardAt(indexPath),
+            let player = player else {
+            return
+        }
+        
+        Phase10GameEngine.shared.discardCard(card, player: player)
+        currentHandCollectionView.reloadData()
+    }
 }
 
 extension Phase10GameViewController: UICollectionViewDropDelegate, UICollectionViewDragDelegate {
     
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
-        guard let dataSource = collectionView.dataSource as? Phase10GameViewDataSource else {
-            return
-        }
-        
         let destinationIndexPath: IndexPath
         if let indexPath = coordinator.destinationIndexPath {
             destinationIndexPath = indexPath
@@ -209,58 +226,62 @@ extension Phase10GameViewController: UICollectionViewDropDelegate, UICollectionV
         }
         
         let item = coordinator.items[0]
+        cardFrom(item.dragItem, collectionView: collectionView, destinationIndexPath: destinationIndexPath)
         
         switch coordinator.proposal.operation
         {
         case .move:
-            print("Moving...")
-            // 1
-            if let sourceIndexPath = item.sourceIndexPath {
-                // 2
-                collectionView.performBatchUpdates({
-                    dataSource.moveCard(
-                        at: sourceIndexPath.item,
-                        to: destinationIndexPath.item)
-                    collectionView.deleteItems(at: [sourceIndexPath])
-                    collectionView.insertItems(at: [destinationIndexPath])
-                })
-                // 3
-                coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
-            }
-        case .copy:
-            print("Copying...")
-            let itemProvider = item.dragItem.itemProvider
-            
-            itemProvider.loadObject(ofClass: NSString.self) { string, error in
-                if let string = string as? String {
-                    
-                    let splitCardString = string.split(separator: " ")
-                    
-                    let color = splitCardString.first!.description
-                    if let parsedType = Int(splitCardString.last!.description),
-                        let type = Phase10CardType(rawValue: parsedType) {
-                        
-                        let card = Phase10Card(type, color: UIColor(named: color))
-                        
-                        dataSource.addCard(card, atIndexPath: destinationIndexPath)
-                        
-                        DispatchQueue.main.async {
-                            collectionView.insertItems(at: [destinationIndexPath])
-                        }
-                    }
-                    
-                }
-            }
+            coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
         default:
             return
         }
     }
     
+    private func cardFrom(_ dragItem: UIDragItem, collectionView: UICollectionView, destinationIndexPath: IndexPath) {
+        dragItem.itemProvider.loadObject(ofClass: NSString.self) { string, error in
+            if let string = string as? String {
+                
+                let splitCardString = string.split(separator: " ")
+                
+                let color = splitCardString.first!.description
+                if let parsedType = Int(splitCardString.last!.description),
+                    let type = Phase10CardType(rawValue: parsedType) {
+                    
+                    var realColor: UIColor
+                    
+                    if color == "red" {
+                        realColor = .red
+                    } else if color == "green" {
+                        realColor = .green
+                    } else if color == "blue" {
+                        realColor = .blue
+                    } else if color == "orange" {
+                        realColor = .orange
+                    } else {
+                        realColor = .black
+                    }
+                    
+                    let card = Phase10Card(type, color: realColor)
+                    
+                    DispatchQueue.main.async {
+                        if let dataSource = collectionView.dataSource as? Phase10GameViewDataSource {
+                            dataSource.acceptDraggedCard(card, to: destinationIndexPath.row)
+                        }
+                        
+                        collectionView.reloadData()
+                    }
+                }
+                
+            }
+        }
+    }
+    
     
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        if let itemForDrag =  collectionView == currentHandCollectionView ? player?.hand[indexPath.row] : player?.potentialSets[indexPath.row] {
-            let itemProvider = NSItemProvider(object: "\(String(describing: itemForDrag.color)) \(itemForDrag.type)" as NSItemProviderWriting)
+        if let itemForDrag =  (collectionView == currentHandCollectionView) ? player?.hand[indexPath.row] : player?.potentialSets[indexPath.row] {
+            let itemProvider = NSItemProvider(object: "\(itemForDrag.description)" as NSItemProviderWriting)
             let dragItem = UIDragItem(itemProvider: itemProvider)
+    
             return [dragItem]
         }
         
@@ -277,13 +298,9 @@ extension Phase10GameViewController: UICollectionViewDropDelegate, UICollectionV
                 return UICollectionViewDropProposal(operation: .cancel)
             }
             
-            if collectionView.hasActiveDrag {
-                return UICollectionViewDropProposal(operation: .move,
-                                                    intent: .insertAtDestinationIndexPath)
-            } else {
-                return UICollectionViewDropProposal(operation: .copy,
-                                                    intent: .insertAtDestinationIndexPath)
-            }
+            return UICollectionViewDropProposal(operation: .move,
+                                                intent: .insertAtDestinationIndexPath)
+            
         } else {
             return UICollectionViewDropProposal(
                 operation: .forbidden)

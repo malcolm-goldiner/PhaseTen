@@ -2,7 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jD5-nq-cHv">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -134,6 +134,13 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dRH-DN-QGr">
+                                <rect key="frame" x="337" y="161" width="69" height="30"/>
+                                <state key="normal" title="Take Card"/>
+                                <connections>
+                                    <action selector="takeCardPressed:" destination="jD5-nq-cHv" eventType="touchUpInside" id="4TJ-di-zqc"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
@@ -146,8 +153,10 @@
                             <constraint firstItem="kOc-C4-4UI" firstAttribute="top" secondItem="Amq-RC-TE3" secondAttribute="bottom" constant="8" id="RXF-K2-1ow"/>
                             <constraint firstItem="sZm-aH-Ps2" firstAttribute="leading" secondItem="LSC-Zq-G7E" secondAttribute="leading" constant="4" id="a9d-2i-VfS"/>
                             <constraint firstItem="3hJ-rY-Mkm" firstAttribute="leading" secondItem="LSC-Zq-G7E" secondAttribute="leading" constant="4" id="cZh-eQ-KRl"/>
+                            <constraint firstItem="dRH-DN-QGr" firstAttribute="centerY" secondItem="PPS-Tc-jvs" secondAttribute="centerY" id="hDw-w0-sO6"/>
                             <constraint firstItem="LSC-Zq-G7E" firstAttribute="trailing" secondItem="O2F-gT-WU5" secondAttribute="trailing" constant="4" id="iCc-4k-fXv"/>
                             <constraint firstItem="LSC-Zq-G7E" firstAttribute="bottom" secondItem="O2F-gT-WU5" secondAttribute="bottom" constant="8" id="jhe-0v-iw4"/>
+                            <constraint firstItem="LSC-Zq-G7E" firstAttribute="trailing" secondItem="dRH-DN-QGr" secondAttribute="trailing" constant="8" id="kWD-9K-nrj"/>
                             <constraint firstItem="3hJ-rY-Mkm" firstAttribute="top" secondItem="sZm-aH-Ps2" secondAttribute="bottom" constant="8" id="opY-m8-XO6"/>
                             <constraint firstItem="Amq-RC-TE3" firstAttribute="leading" secondItem="LSC-Zq-G7E" secondAttribute="leading" constant="4" id="oyD-WR-xIW"/>
                             <constraint firstItem="Amq-RC-TE3" firstAttribute="top" secondItem="OEs-bN-dzX" secondAttribute="bottom" constant="8" id="rb6-Dd-Ijf"/>
@@ -160,6 +169,7 @@
                         <outlet property="discard" destination="Amq-RC-TE3" id="V2t-be-hhh"/>
                         <outlet property="potentialCardSetCollectionView" destination="3hJ-rY-Mkm" id="Bnp-od-fnN"/>
                         <outlet property="scoreLabel" destination="OEs-bN-dzX" id="roB-zb-OVe"/>
+                        <outlet property="takeCardButton" destination="dRH-DN-QGr" id="YCU-9e-Bvt"/>
                         <outlet property="topOfPileCardView" destination="kOc-C4-4UI" id="kjx-DM-xez"/>
                     </connections>
                 </viewController>

@@ -86,13 +86,17 @@ class Phase10GameEngine {
     }
     
     func pickFromDiscardPile(player: Phase10Player) {
-        if let card = discardPile.last {
-            player.hand.append(card)
+        guard discardPile.isEmpty == false else {
+            return
         }
+        
+        let card = discardPile.removeLast()
+        player.hand.append(card)
     }
     
-    func discardCard(_ card: Phase10Card) {
+    func discardCard(_ card: Phase10Card, player: Phase10Player) {
         discardPile.append(card)
+        player.hand = player.hand.filter { $0 != card }
     }
     
     func addPlayer() {

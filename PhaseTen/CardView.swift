@@ -15,15 +15,21 @@ class CardView: UIView {
     static let nibName = "CardCell"
 
     var card: Phase10Card? {
-        didSet {
-            guard let card = card else {
+        willSet {
+            guard newValue != card else {
                 return
             }
             
-            cardTypeLabel.text = card.type.displayValue()
+            if superview?.superview?.isKind(of: CardCollectionViewCell.self) == false {
+              print(newValue?.description)
+            }
+            
+           
+            
+            cardTypeLabel.text = newValue?.type.displayValue()
             cardTypeLabel.textColor = .white
             
-            backgroundColor = card.color
+            backgroundColor = newValue?.color
         }
     }
     

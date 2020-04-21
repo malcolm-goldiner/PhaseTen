@@ -62,6 +62,26 @@ class Phase10Card: Hashable, Equatable {
     
     let color: UIColor?
     
+    var description: String {
+        var desc: String = ""
+        
+        if color == .red {
+                desc += "red"
+        } else if color == .blue {
+            desc += "blue"
+        } else if color == .orange {
+            desc += "orange"
+        } else if color == .green {
+            desc += "green"
+        } else {
+            desc += "black"
+        }
+        
+        desc += " \(type.rawValue)"
+        
+        return desc
+    }
+    
     init(_ type: Phase10CardType, color: UIColor? = nil) {
         self.type = type
         self.color = color ?? .black // default for wild and skip
