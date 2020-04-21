@@ -26,18 +26,26 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
     }
     
     func cardAt(_ indexPath: IndexPath) -> Phase10Card? {
+        guard let player = player else {
+            return nil
+        }
+        
         if deckType == .hand {
-            return player?.hand[indexPath.row]
+            return player.hand[indexPath.row]
         } else {
-            return player?.potentialSets[indexPath.row]
+            return player.potentialSets[indexPath.row]
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard let player = player else {
+            return 0
+        }
+        
         if deckType == .set {
-            return player?.potentialSets.count ?? 0
+            return player.potentialSets.count
         } else {
-            return player?.hand.count ?? 0
+            return player.hand.count
         }
     }
     
@@ -52,11 +60,15 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
     }
     
     func addCard(_ card: Phase10Card, atIndexPath indexPath: IndexPath) {
+        guard let player = player else {
+            return
+        }
+        
         switch deckType {
         case .set:
-            player?.potentialSets.append(card)
+            player.potentialSets.append(card)
         case .hand:
-            player?.hand.append(card)
+            player.hand.append(card)
         }
     }
     

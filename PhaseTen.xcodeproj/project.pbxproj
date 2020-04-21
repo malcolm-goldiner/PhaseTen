@@ -57,6 +57,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1F5B551B244EBEDF0045F5F5 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				1F7BD780243AAAB40083854B /* Main.storyboard */,
+				1F7BD77E2439CDC40083854B /* CardCollectionViewCell.swift */,
+				1F7BD7A8243C47B00083854B /* CardView.swift */,
+				1F7BD77B2439CD120083854B /* CardCell.xib */,
+				1F7BD7AA243C49780083854B /* CardView.xib */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		1F5B551C244EBEF40045F5F5 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1F7BD7782439A95B0083854B /* Phase10GameEngine.swift */,
+				1F7BD7A6243C445E0083854B /* Phase10BackingModels.swift */,
+				1F7BD7762436DE0E0083854B /* Phase10Card.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		1F5B551D244EBF270045F5F5 /* Boiler Plate */ = {
+			isa = PBXGroup;
+			children = (
+				1F7BD76D2436DA850083854B /* LaunchScreen.storyboard */,
+				1F7BD7622436DA820083854B /* AppDelegate.swift */,
+				1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */,
+			);
+			path = "Boiler Plate";
+			sourceTree = "<group>";
+		};
 		1F7BD7562436DA820083854B = {
 			isa = PBXGroup;
 			children = (
@@ -76,22 +108,14 @@
 		1F7BD7612436DA820083854B /* PhaseTen */ = {
 			isa = PBXGroup;
 			children = (
-				1F7BD7622436DA820083854B /* AppDelegate.swift */,
-				1F7BD780243AAAB40083854B /* Main.storyboard */,
-				1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */,
-				1F7BD7762436DE0E0083854B /* Phase10Card.swift */,
 				1F7BD7A4243B0BD40083854B /* Phase10GameViewController.swift */,
 				1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */,
 				1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */,
-				1F7BD77E2439CDC40083854B /* CardCollectionViewCell.swift */,
-				1F7BD7A8243C47B00083854B /* CardView.swift */,
-				1F7BD77B2439CD120083854B /* CardCell.xib */,
-				1F7BD7AA243C49780083854B /* CardView.xib */,
-				1F7BD7782439A95B0083854B /* Phase10GameEngine.swift */,
-				1F7BD7A6243C445E0083854B /* Phase10BackingModels.swift */,
+				1F5B551B244EBEDF0045F5F5 /* UI */,
+				1F5B551C244EBEF40045F5F5 /* Models */,
 				1F7BD7682436DA850083854B /* Assets.xcassets */,
-				1F7BD76D2436DA850083854B /* LaunchScreen.storyboard */,
 				1F7BD7702436DA850083854B /* Info.plist */,
+				1F5B551D244EBF270045F5F5 /* Boiler Plate */,
 				1F7BD76A2436DA850083854B /* Preview Content */,
 			);
 			path = PhaseTen;

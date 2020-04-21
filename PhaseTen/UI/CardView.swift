@@ -20,12 +20,6 @@ class CardView: UIView {
                 return
             }
             
-            if superview?.superview?.isKind(of: CardCollectionViewCell.self) == false {
-              print(newValue?.description)
-            }
-            
-           
-            
             cardTypeLabel.text = newValue?.type.displayValue()
             cardTypeLabel.textColor = .white
             

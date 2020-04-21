@@ -6,7 +6,8 @@
 //  Copyright © 2020 Malcolm Goldiner. All rights reserved.
 //
 
-
+import UIKit
+import Combine
 
 class Phase10GameViewController: UIViewController {
     
@@ -25,16 +26,14 @@ class Phase10GameViewController: UIViewController {
     var needsReload: Bool = false {
         didSet {
             if needsReload {
-                currentHandCollectionView.reloadData()
-                potentialCardSetCollectionView.reloadData()
+                reloadCards()
             }
         }
     }
     
     var player: Phase10Player? {
         didSet {
-            currentHandCollectionView.reloadData()
-            potentialCardSetCollectionView.reloadData()
+           reloadCards()
         }
     }
     
@@ -55,6 +54,11 @@ class Phase10GameViewController: UIViewController {
         }
         
         Phase10GameEngine.shared.pickFromDiscardPile(player: player)
+    }
+    
+    private func reloadCards() {
+        currentHandCollectionView.reloadData()
+        potentialCardSetCollectionView.reloadData()
     }
     
     private func listenForGameStateChanges() {
@@ -89,7 +93,7 @@ class Phase10GameViewController: UIViewController {
     }
     
     private func setupCollectionViews() {
-        self.currentHandCollectionView!.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
+        self.currentHandCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
         
         self.potentialCardSetCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
         
@@ -107,8 +111,7 @@ class Phase10GameViewController: UIViewController {
         potentialCardSetCollectionView.dropDelegate = self
         potentialCardSetCollectionView.dragDelegate = self
         
-        potentialCardSetCollectionView.reloadData()
-        currentHandCollectionView.reloadData()
+        reloadCards()
     }
     
 }
