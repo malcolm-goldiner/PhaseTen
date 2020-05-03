@@ -103,5 +103,4 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
         }
     }
     
-    
 }

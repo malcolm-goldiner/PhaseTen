@@ -8,6 +8,8 @@
 
 import UIKit
 import Combine
+import CloudKit
+
 
 class Phase10GameViewController: UIViewController {
     
@@ -22,6 +24,8 @@ class Phase10GameViewController: UIViewController {
     @IBOutlet weak var currentHandCollectionView: UICollectionView!
     
     @IBOutlet weak var takeCardButton: UIButton!
+    
+    let database = CKContainer.default().publicCloudDatabase
     
     var needsReload: Bool = false {
         didSet {
@@ -40,6 +44,10 @@ class Phase10GameViewController: UIViewController {
     var handDataSource: Phase10GameViewDataSource?
     
     var setDataSource: Phase10GameViewDataSource?
+    
+    var gameReference: CKRecord.Reference?
+    
+    var gameRecord: CKRecord?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,8 +96,70 @@ class Phase10GameViewController: UIViewController {
         player = Phase10GameEngine.shared.players.first
         handDataSource = Phase10GameViewDataSource(deckType: .hand, game: Phase10GameEngine.shared)
         setDataSource = Phase10GameViewDataSource(deckType: .set, game: Phase10GameEngine.shared)
-        
+        persistGame()
         setupCollectionViews()
+    }
+    
+    private func persistGame() {
+        gameRecord = CKRecord(recordType: Phase10GameEngine.recordType)
+        gameRecord?.setValue(0, forKey: "turnIndex")
+        save(record: gameRecord!)
+        
+        let deck = CKRecord(recordType: Phase10Deck.recordType)
+        gameReference = CKRecord.Reference(recordID: gameRecord!.recordID, action: .none)
+        deck.setValue(gameReference, forKey: "game")
+        save(record: deck)
+        
+        saveCards(deck, withCards: Phase10GameEngine.shared.deck.cards)
+        savePlayers(inGame: gameReference)
+    }
+    
+    private func saveDiscardPile() {
+       // find this card record
+       // update to go into the discard field on game
+    }
+    
+    private func savePlayers(inGame gameReference: CKRecord.Reference?) {
+        Phase10GameEngine.shared.players.forEach { player in
+            let playerRecord = CKRecord(recordType: Phase10Player.recordType)
+            playerRecord.setValue(player.name, forKey: "name")
+            
+            let cardRecords: [CKRecord] = player.hand.compactMap { card in
+                let cardRecord = CKRecord(recordType: Phase10Card.recordType)
+                cardRecord.setValue(card.description, forKey: "description")
+                save(record: cardRecord)
+                return cardRecord
+            }
+           
+            let cardReferences: [CKRecord.Reference] = cardRecords.compactMap { record in
+                return  CKRecord.Reference(record: record, action: .none)
+            }
+            
+            playerRecord.setValue(cardReferences, forKey: "hand")
+            playerRecord.setValue(gameReference, forKey: "game")
+            save(record: playerRecord)
+        }
+    }
+    
+    private func saveCards(_ deck: CKRecord, withCards cards: [Phase10Card]) {
+        cards.forEach { card in
+            let cardRecord = CKRecord(recordType: Phase10Card.recordType)
+            cardRecord.setValue(card.description, forKey: "description")
+            let deckReference = CKRecord.Reference(record: deck, action: .none)
+            cardRecord.setValue(deckReference, forKey: "deck")
+            save(record: cardRecord)
+        }
+    }
+    
+    private func save(record: CKRecord) {
+        database.save(record) { (record, error) in
+             if let error = error as? CKError,
+                error.code.rawValue == 9 {
+                print("Not signed into iCloud")
+            } else {
+                print("record not saved")
+            }
+        }
     }
     
     private func setupCollectionViews() {

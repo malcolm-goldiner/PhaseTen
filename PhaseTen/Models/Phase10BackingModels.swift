@@ -148,6 +148,8 @@ indirect enum ValidatedCombo: Equatable, Hashable {
 
 class Phase10Player: Equatable, Hashable {
     
+    static let recordType = "Player"
+    
     static func == (lhs: Phase10Player, rhs: Phase10Player) -> Bool {
         return lhs.hand == rhs.hand && lhs.phase == rhs.phase
     }
@@ -167,4 +169,5 @@ class Phase10Player: Equatable, Hashable {
         hasher.combine(hand)
         hasher.combine(phase)
     }
+    
 }

@@ -10,6 +10,8 @@
 		1F08F2DE2442DBC8002CD470 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */; };
 		1F5B5518244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */; };
 		1F5B551A244EBE720045F5F5 /* Phase10GameViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */; };
+		1F5B5521245400CB0045F5F5 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5B5520245400CB0045F5F5 /* CloudKit.framework */; };
+		1F5B5523245E880F0045F5F5 /* Phase10Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5B5522245E880F0045F5F5 /* Phase10Model.swift */; };
 		1F7BD7632436DA820083854B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD7622436DA820083854B /* AppDelegate.swift */; };
 		1F7BD7692436DA850083854B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F7BD7682436DA850083854B /* Assets.xcassets */; };
 		1F7BD76C2436DA850083854B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F7BD76B2436DA850083854B /* Preview Assets.xcassets */; };
@@ -29,6 +31,9 @@
 		1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Phase10GameViewController+DragandDrop.swift"; sourceTree = "<group>"; };
 		1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase10GameViewDataSource.swift; sourceTree = "<group>"; };
+		1F5B551E245400C00045F5F5 /* PhaseTen.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PhaseTen.entitlements; sourceTree = "<group>"; };
+		1F5B5520245400CB0045F5F5 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		1F5B5522245E880F0045F5F5 /* Phase10Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase10Model.swift; sourceTree = "<group>"; };
 		1F7BD75F2436DA820083854B /* PhaseTen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhaseTen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F7BD7622436DA820083854B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1F7BD7682436DA850083854B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -51,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F5B5521245400CB0045F5F5 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +81,7 @@
 				1F7BD7782439A95B0083854B /* Phase10GameEngine.swift */,
 				1F7BD7A6243C445E0083854B /* Phase10BackingModels.swift */,
 				1F7BD7762436DE0E0083854B /* Phase10Card.swift */,
+				1F5B5522245E880F0045F5F5 /* Phase10Model.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -89,11 +96,20 @@
 			path = "Boiler Plate";
 			sourceTree = "<group>";
 		};
+		1F5B551F245400CB0045F5F5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1F5B5520245400CB0045F5F5 /* CloudKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		1F7BD7562436DA820083854B = {
 			isa = PBXGroup;
 			children = (
 				1F7BD7612436DA820083854B /* PhaseTen */,
 				1F7BD7602436DA820083854B /* Products */,
+				1F5B551F245400CB0045F5F5 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,6 +124,7 @@
 		1F7BD7612436DA820083854B /* PhaseTen */ = {
 			isa = PBXGroup;
 			children = (
+				1F5B551E245400C00045F5F5 /* PhaseTen.entitlements */,
 				1F7BD7A4243B0BD40083854B /* Phase10GameViewController.swift */,
 				1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */,
 				1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */,
@@ -206,6 +223,7 @@
 				1F7BD7792439A95B0083854B /* Phase10GameEngine.swift in Sources */,
 				1F08F2DE2442DBC8002CD470 /* SceneDelegate.swift in Sources */,
 				1F7BD7772436DE0E0083854B /* Phase10Card.swift in Sources */,
+				1F5B5523245E880F0045F5F5 /* Phase10Model.swift in Sources */,
 				1F5B5518244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift in Sources */,
 				1F7BD7A7243C445E0083854B /* Phase10BackingModels.swift in Sources */,
 				1F7BD7A9243C47B00083854B /* CardView.swift in Sources */,
@@ -348,6 +366,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PhaseTen/PhaseTen.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"PhaseTen/Preview Content\"";
 				DEVELOPMENT_TEAM = W36PVYAHBM;
@@ -357,7 +376,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.malcolmgoldiner.PhaseTen;
+				PRODUCT_BUNDLE_IDENTIFIER = Phase10;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -368,6 +387,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PhaseTen/PhaseTen.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"PhaseTen/Preview Content\"";
 				DEVELOPMENT_TEAM = W36PVYAHBM;
@@ -377,7 +397,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.malcolmgoldiner.PhaseTen;
+				PRODUCT_BUNDLE_IDENTIFIER = Phase10;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

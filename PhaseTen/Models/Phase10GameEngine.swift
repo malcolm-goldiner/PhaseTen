@@ -13,6 +13,8 @@ class Phase10GameEngine {
     
     static let shared = Phase10GameEngine()
     
+    static let recordType = "Phase10Game"
+    
     private static let handSize = 10
     
     private static let maxPlayers = 6
@@ -116,6 +118,7 @@ class Phase10GameEngine {
         }
         
         player.hand.append(contentsOf: deck.cards[0...9])
+        deck.cards.removeSubrange(0...9)
     }
     
     func validatePhase(for player: Phase10Player, playedCards: [Phase10Card]) -> Bool {

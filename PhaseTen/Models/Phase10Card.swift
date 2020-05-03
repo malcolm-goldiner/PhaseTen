@@ -58,6 +58,8 @@ class Phase10Card: Hashable, Equatable {
     
     static let cardColors: [UIColor] = [.red, .blue, .orange, .green]
     
+    static let recordType = "Phase10Card"
+    
     let type: Phase10CardType
     
     let color: UIColor?
@@ -94,6 +96,8 @@ class Phase10Card: Hashable, Equatable {
 }
 
 class Phase10Deck {
+    
+    static let recordType = "Deck"
     
     var cards: [Phase10Card]
     
