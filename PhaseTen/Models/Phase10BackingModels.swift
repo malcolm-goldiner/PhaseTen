@@ -146,7 +146,14 @@ indirect enum ValidatedCombo: Equatable, Hashable {
 
 
 
-class Phase10Player: Equatable, Hashable {
+class Phase10Player: Phase10Model, Equatable, Hashable {
+    
+    enum Key: String {
+        case name = "name"
+        case hand = "hand"
+        case phase = "phase"
+        case game = "game"
+    }
     
     static let recordType = "Player"
     
@@ -169,5 +176,7 @@ class Phase10Player: Equatable, Hashable {
         hasher.combine(hand)
         hasher.combine(phase)
     }
+    
+    weak var game: Phase10GameEngine?
     
 }

@@ -15,6 +15,13 @@ class Phase10GameEngine {
     
     static let recordType = "Phase10Game"
     
+    enum Key: String {
+        case discardPile = "discardPile"
+        case players = "players"
+        case turnIndex = "turnIndex"
+        case hasWinner = "hasWinner"
+    }
+    
     private static let handSize = 10
     
     private static let maxPlayers = 6

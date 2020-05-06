@@ -83,6 +83,10 @@ class Phase10GameViewController: UIViewController {
         let discardPileSubscriber = Subscribers.Assign(object: topOfPileCardView, keyPath: \.card)
         Phase10GameEngine.shared.$discardPile.map { $0.last }.subscribe(discardPileSubscriber)
         
+        Phase10GameEngine.shared.$discardPile.sink { [weak self] _ in
+            self?.saveDiscardPile()
+        }
+        
         let handSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         player?.$hand.map { !$0.isEmpty }.subscribe(handSubscriber)
         
@@ -102,12 +106,12 @@ class Phase10GameViewController: UIViewController {
     
     private func persistGame() {
         gameRecord = CKRecord(recordType: Phase10GameEngine.recordType)
-        gameRecord?.setValue(0, forKey: "turnIndex")
+        gameRecord?[.turnIndex] = 0
         save(record: gameRecord!)
         
         let deck = CKRecord(recordType: Phase10Deck.recordType)
         gameReference = CKRecord.Reference(recordID: gameRecord!.recordID, action: .none)
-        deck.setValue(gameReference, forKey: "game")
+        deck[Phase10Deck.Key.game] = gameReference
         save(record: deck)
         
         saveCards(deck, withCards: Phase10GameEngine.shared.deck.cards)
@@ -115,18 +119,33 @@ class Phase10GameViewController: UIViewController {
     }
     
     private func saveDiscardPile() {
-       // find this card record
-       // update to go into the discard field on game
+        guard let gameRecord = gameRecord else {
+            return
+        }
+        
+        let cardReferences: [CKRecord.Reference] = Phase10GameEngine.shared.discardPile.compactMap { card in
+            guard let recordID = card.recordID else {
+                return nil
+            }
+            
+            return CKRecord(recordType: Phase10Card.recordType, recordID: recordID)
+        }.compactMap { record in
+            return  CKRecord.Reference(record: record, action: .none)
+        }
+        
+        gameRecord[.discardPile] = cardReferences
+        
+        save(record: gameRecord)
     }
     
     private func savePlayers(inGame gameReference: CKRecord.Reference?) {
         Phase10GameEngine.shared.players.forEach { player in
             let playerRecord = CKRecord(recordType: Phase10Player.recordType)
-            playerRecord.setValue(player.name, forKey: "name")
+            playerRecord[.name] = player.name
             
             let cardRecords: [CKRecord] = player.hand.compactMap { card in
                 let cardRecord = CKRecord(recordType: Phase10Card.recordType)
-                cardRecord.setValue(card.description, forKey: "description")
+                cardRecord[.description] = card.description
                 save(record: cardRecord)
                 return cardRecord
             }
@@ -135,8 +154,8 @@ class Phase10GameViewController: UIViewController {
                 return  CKRecord.Reference(record: record, action: .none)
             }
             
-            playerRecord.setValue(cardReferences, forKey: "hand")
-            playerRecord.setValue(gameReference, forKey: "game")
+            playerRecord[.hand] = cardReferences
+            playerRecord[Phase10Player.Key.game] = gameReference
             save(record: playerRecord)
         }
     }
@@ -144,9 +163,9 @@ class Phase10GameViewController: UIViewController {
     private func saveCards(_ deck: CKRecord, withCards cards: [Phase10Card]) {
         cards.forEach { card in
             let cardRecord = CKRecord(recordType: Phase10Card.recordType)
-            cardRecord.setValue(card.description, forKey: "description")
+            cardRecord[.description] = card.description
             let deckReference = CKRecord.Reference(record: deck, action: .none)
-            cardRecord.setValue(deckReference, forKey: "deck")
+            cardRecord[Phase10Card.Key.deck] = deckReference
             save(record: cardRecord)
         }
     }
@@ -155,9 +174,9 @@ class Phase10GameViewController: UIViewController {
         database.save(record) { (record, error) in
              if let error = error as? CKError,
                 error.code.rawValue == 9 {
-                print("Not signed into iCloud")
+                print(Phase10Error.auth.rawValue)
             } else {
-                print("record not saved")
+                print(Phase10Error.unknown.rawValue)
             }
         }
     }

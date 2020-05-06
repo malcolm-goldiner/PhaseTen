@@ -50,7 +50,13 @@ enum Phase10CardType: Int, CaseIterable {
 }
 
 
-class Phase10Card: Hashable, Equatable {
+class Phase10Card: Phase10Model, Hashable, Equatable {
+    
+    enum Key: String {
+        case type = "type"
+        case description = "description"
+        case deck = "deck"
+    }
     
     static func == (lhs: Phase10Card, rhs: Phase10Card) -> Bool {
         return lhs.type == rhs.type && lhs.color == rhs.color
@@ -95,13 +101,20 @@ class Phase10Card: Hashable, Equatable {
     }
 }
 
-class Phase10Deck {
+class Phase10Deck: Phase10Model {
     
     static let recordType = "Deck"
     
+    enum Key: String {
+        case cards = "cards"
+        case game = "game"
+    }
+    
+    weak var game: Phase10GameEngine?
+    
     var cards: [Phase10Card]
     
-    init() {
+    override init() {
         var buildingCards = [Phase10Card]()
         
         for type in Phase10CardType.allCases {
