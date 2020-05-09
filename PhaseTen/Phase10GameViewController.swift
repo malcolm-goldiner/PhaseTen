@@ -87,6 +87,8 @@ class Phase10GameViewController: UIViewController {
             self?.saveDiscardPile()
         }
         
+        // save first card
+        
         let handSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         player?.$hand.map { !$0.isEmpty }.subscribe(handSubscriber)
         
@@ -175,8 +177,10 @@ class Phase10GameViewController: UIViewController {
              if let error = error as? CKError,
                 error.code.rawValue == 9 {
                 print(Phase10Error.auth.rawValue)
-            } else {
+            } else if error != nil {
                 print(Phase10Error.unknown.rawValue)
+             } else {
+                print("Saved \(String(describing: record?.recordType))")
             }
         }
     }
