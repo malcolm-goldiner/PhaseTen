@@ -180,3 +180,16 @@ class Phase10Player: Phase10Model, Equatable, Hashable {
     weak var game: Phase10GameEngine?
     
 }
+
+enum Phase10Action {
+    case discard
+    case pickup
+}
+
+struct Phase10Turn {
+    var actions: [Phase10Action]
+    
+    var isComplete : Bool {
+        return (actions.count == 2) && actions.first != actions[1]
+    }
+}

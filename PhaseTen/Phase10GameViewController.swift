@@ -24,9 +24,7 @@ class Phase10GameViewController: UIViewController {
     @IBOutlet weak var currentHandCollectionView: UICollectionView!
     
     @IBOutlet weak var turnWaitingActivityIndicator: UIActivityIndicatorView!
-    
-    let database = CKContainer.default().publicCloudDatabase
-    
+
     var needsReload: Bool = false {
         didSet {
             if needsReload {
@@ -37,7 +35,7 @@ class Phase10GameViewController: UIViewController {
     
     var player: Phase10Player? {
         didSet {
-           reloadCards()
+            reloadCards()
         }
     }
     
@@ -47,9 +45,7 @@ class Phase10GameViewController: UIViewController {
     
     var discardDataSource: Phase10GameViewDataSource?
     
-    var gameReference: CKRecord.Reference?
-    
-    var gameRecord: CKRecord?
+    var gameManager: Phase10GameEngineManager?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,24 +61,18 @@ class Phase10GameViewController: UIViewController {
     }
     
     private func listenForGameStateChanges() {
-        let scoreSubscriber = Subscribers.Assign(object: scoreLabel, keyPath: \.text)
-        Phase10GameEngine.shared.$scoresByPlayer.map { [weak self] scoreDict in
-            if let player = self?.player,
-                let currentScore = scoreDict[player] {
-                return "Score: \(currentScore)"
-            }
-            
-            return "Score: 0"
-        }.subscribe(scoreSubscriber)
+        guard let player = player else {
+            return
+        }
+        gameManager?.listenToScoreChanges(onLabel: scoreLabel, forPlayer: player)
         
-        
-        Phase10GameEngine.shared.$discardPile.sink { [weak self] _ in
-            self?.saveDiscardPile()
+        _ = Phase10GameEngine.shared.$discardPile.sink { [weak self] _ in
+            self?.gameManager?.saveDiscardPile()
         }
         
-        Phase10GameEngine.shared.$turnIndex.sink { [weak self] newIndex in
-             let player = Phase10GameEngine.shared.players[newIndex]
-           
+        _ = Phase10GameEngine.shared.$turnIndex.sink { [weak self] newIndex in
+            let player = Phase10GameEngine.shared.players[newIndex]
+            
             if self?.player == player {
                 self?.turnWaitingActivityIndicator.stopAnimating()
             } else {
@@ -90,111 +80,26 @@ class Phase10GameViewController: UIViewController {
             }
         }
         
-        // save first card in discard pile
-        if let firstCard = Phase10GameEngine.shared.discardPile.first {
-            let record = CKRecord(recordType: Phase10Card.recordType)
-            save(record: record, modelObj: firstCard)
-        }
+        gameManager?.saveFirstCard()
         
         let handSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
-        player?.$hand.map { !$0.isEmpty }.subscribe(handSubscriber)
+        player.$hand.map { !$0.isEmpty }.subscribe(handSubscriber)
         
         let setSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
-        player?.$potentialSets.map { !$0.isEmpty }.subscribe(setSubscriber)
+        player.$potentialSets.map { !$0.isEmpty }.subscribe(setSubscriber)
         
         let discardSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         Phase10GameEngine.shared.$discardPile.map { !$0.isEmpty }.subscribe(discardSubscriber)
     }
-    
-    
+
     private func startGame() {
         Phase10GameEngine.shared.addPlayer()
         player = Phase10GameEngine.shared.players.first
         handDataSource = Phase10GameViewDataSource(deckType: .hand, game: Phase10GameEngine.shared)
         setDataSource = Phase10GameViewDataSource(deckType: .set, game: Phase10GameEngine.shared)
         discardDataSource = Phase10GameViewDataSource(deckType: .discard, game: Phase10GameEngine.shared)
-        persistGame()
+        gameManager?.persistGame()
         setupCollectionViews()
-    }
-    
-    private func persistGame() {
-        gameRecord = CKRecord(recordType: Phase10GameEngine.recordType)
-        gameRecord?[.turnIndex] = 0
-        save(record: gameRecord!, modelObj: Phase10GameEngine.shared)
-        
-        let deck = CKRecord(recordType: Phase10Deck.recordType)
-        gameReference = CKRecord.Reference(recordID: gameRecord!.recordID, action: .none)
-        deck[Phase10Deck.Key.game] = gameReference
-        save(record: deck)
-        
-        saveCards(deck, withCards: Phase10GameEngine.shared.deck.cards)
-        savePlayers(inGame: gameReference)
-    }
-    
-    private func saveDiscardPile() {
-        guard let gameRecord = gameRecord else {
-            return
-        }
-        
-        let cardReferences: [CKRecord.Reference] = Phase10GameEngine.shared.discardPile.compactMap { card in
-            guard let recordID = card.recordID else {
-                return nil
-            }
-            
-            return CKRecord(recordType: Phase10Card.recordType, recordID: recordID)
-        }.compactMap { record in
-            return  CKRecord.Reference(record: record, action: .none)
-        }
-        
-        gameRecord[.discardPile] = cardReferences
-        
-        save(record: gameRecord, modelObj: Phase10GameEngine.shared)
-    }
-    
-    private func savePlayers(inGame gameReference: CKRecord.Reference?) {
-        Phase10GameEngine.shared.players.forEach { player in
-            let playerRecord = CKRecord(recordType: Phase10Player.recordType)
-            playerRecord[.name] = player.name
-            
-            let cardRecords: [CKRecord] = player.hand.compactMap { card in
-                let cardRecord = CKRecord(recordType: Phase10Card.recordType)
-                cardRecord[.description] = card.description
-                save(record: cardRecord, modelObj: card)
-                return cardRecord
-            }
-           
-            let cardReferences: [CKRecord.Reference] = cardRecords.compactMap { record in
-                return  CKRecord.Reference(record: record, action: .none)
-            }
-            
-            playerRecord[.hand] = cardReferences
-            playerRecord[Phase10Player.Key.game] = gameReference
-            save(record: playerRecord, modelObj: player)
-        }
-    }
-    
-    private func saveCards(_ deck: CKRecord, withCards cards: [Phase10Card]) {
-        cards.forEach { card in
-            let cardRecord = CKRecord(recordType: Phase10Card.recordType)
-            cardRecord[.description] = card.description
-            let deckReference = CKRecord.Reference(record: deck, action: .none)
-            cardRecord[Phase10Card.Key.deck] = deckReference
-            save(record: cardRecord, modelObj: card)
-        }
-    }
-    
-    private func save(record: CKRecord, modelObj: Phase10Model? = nil) {
-        database.save(record) { (record, error) in
-             if let error = error as? CKError,
-                error.code.rawValue == 9 {
-                print(Phase10Error.auth.rawValue)
-            } else if error != nil {
-                print(Phase10Error.unknown.rawValue)
-             } else {
-                print("Saved \(String(describing: record?.recordType))")
-                modelObj?.recordID = record?.recordID
-            }
-        }
     }
     
     private func setupCollectionViews() {

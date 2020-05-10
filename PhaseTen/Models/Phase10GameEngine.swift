@@ -57,6 +57,8 @@ class Phase10GameEngine: Phase10Model {
     @Published
     var turnIndex: Int = 0
     
+    var currentTurn: Phase10Turn?
+    
     override init() {
         super.init()
         
@@ -87,6 +89,19 @@ class Phase10GameEngine: Phase10Model {
         }
     }
     
+    func addActionToTurn(_ action: Phase10Action) {
+        if currentTurn != nil {
+            currentTurn?.actions.append(action)
+        }
+        
+        if currentTurn?.actions.contains(action) == false{
+            turnIndex += 1
+            currentTurn = nil 
+        } else {
+            assertionFailure("Two of the same actiona aren't allowed in one turn ")
+        }
+    }
+    
     func beginNewRound() {
         for player in players {
             discardPile.insert(contentsOf: player.hand, at: 0)
@@ -97,20 +112,6 @@ class Phase10GameEngine: Phase10Model {
                 scoresByPlayer[player, default: 0] += player.hand.reduce(0) { $0 + $1.type.rawValue }
             }
         }
-    }
-    
-    func pickFromDiscardPile(player: Phase10Player) {
-        guard discardPile.isEmpty == false else {
-            return
-        }
-        
-        let card = discardPile.removeLast()
-        player.hand.append(card)
-    }
-    
-    func discardCard(_ card: Phase10Card, player: Phase10Player) {
-        discardPile.append(card)
-        player.hand = player.hand.filter { $0 != card }
     }
     
     func addPlayer() {
