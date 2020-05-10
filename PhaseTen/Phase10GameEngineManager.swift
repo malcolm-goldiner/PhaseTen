@@ -29,12 +29,12 @@ class Phase10GameEngineManager {
         }
         
         gameRecord[.turnIndex] = 0
-        save(record: gameRecord, modelObj: Phase10GameEngine.shared)
+        Phase10GameEngine.shared.save(record: gameRecord)
         
         let deck = CKRecord(recordType: Phase10Deck.recordType)
         gameReference = CKRecord.Reference(recordID: gameRecord.recordID, action: .none)
         deck[Phase10Deck.Key.game] = gameReference
-        save(record: deck)
+        Phase10Model.save(record: deck)
         
         saveCards(deck, withCards: Phase10GameEngine.shared.deck.cards)
         savePlayers(inGame: gameReference)
@@ -57,7 +57,7 @@ class Phase10GameEngineManager {
         
         gameRecord[.discardPile] = cardReferences
         
-        save(record: gameRecord, modelObj: Phase10GameEngine.shared)
+        Phase10GameEngine.shared.save(record: gameRecord)
     }
     
     private func savePlayers(inGame gameReference: CKRecord.Reference?) {
@@ -68,7 +68,7 @@ class Phase10GameEngineManager {
             let cardRecords: [CKRecord] = player.hand.compactMap { card in
                 let cardRecord = CKRecord(recordType: Phase10Card.recordType)
                 cardRecord[.description] = card.description
-                save(record: cardRecord, modelObj: card)
+                card.save(record: cardRecord)
                 return cardRecord
             }
             
@@ -78,7 +78,7 @@ class Phase10GameEngineManager {
             
             playerRecord[.hand] = cardReferences
             playerRecord[Phase10Player.Key.game] = gameReference
-            save(record: playerRecord, modelObj: player)
+            player.save(record: playerRecord)
         }
     }
     
@@ -88,21 +88,7 @@ class Phase10GameEngineManager {
             cardRecord[.description] = card.description
             let deckReference = CKRecord.Reference(record: deck, action: .none)
             cardRecord[Phase10Card.Key.deck] = deckReference
-            save(record: cardRecord, modelObj: card)
-        }
-    }
-    
-    private func save(record: CKRecord, modelObj: Phase10Model? = nil) {
-        database.save(record) { (record, error) in
-            if let error = error as? CKError,
-                error.code.rawValue == 9 {
-                print(Phase10Error.auth.rawValue)
-            } else if error != nil {
-                print(Phase10Error.unknown.rawValue)
-            } else {
-                print("Saved \(String(describing: record?.recordType))")
-                modelObj?.recordID = record?.recordID
-            }
+            card.save(record: cardRecord)
         }
     }
     
@@ -110,7 +96,7 @@ class Phase10GameEngineManager {
         // save first card in discard pile
         if let firstCard = Phase10GameEngine.shared.discardPile.first {
             let record = CKRecord(recordType: Phase10Card.recordType)
-            save(record: record, modelObj: firstCard)
+            firstCard.save(record: record)
         }
     }
     
