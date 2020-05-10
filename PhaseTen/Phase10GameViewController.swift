@@ -17,13 +17,13 @@ class Phase10GameViewController: UIViewController {
     
     @IBOutlet weak var discard: UILabel!
     
-    @IBOutlet weak var topOfPileCardView: CardView!
+    @IBOutlet weak var discardPileCollectionView: UICollectionView!
     
     @IBOutlet weak var potentialCardSetCollectionView: UICollectionView!
     
     @IBOutlet weak var currentHandCollectionView: UICollectionView!
     
-    @IBOutlet weak var takeCardButton: UIButton!
+    @IBOutlet weak var turnWaitingActivityIndicator: UIActivityIndicatorView!
     
     let database = CKContainer.default().publicCloudDatabase
     
@@ -45,6 +45,8 @@ class Phase10GameViewController: UIViewController {
     
     var setDataSource: Phase10GameViewDataSource?
     
+    var discardDataSource: Phase10GameViewDataSource?
+    
     var gameReference: CKRecord.Reference?
     
     var gameRecord: CKRecord?
@@ -56,17 +58,10 @@ class Phase10GameViewController: UIViewController {
         listenForGameStateChanges()
     }
     
-    @IBAction func takeCardPressed(_ sender: UIButton) {
-        guard let player = player else {
-            return
-        }
-        
-        Phase10GameEngine.shared.pickFromDiscardPile(player: player)
-    }
-    
     private func reloadCards() {
         currentHandCollectionView.reloadData()
         potentialCardSetCollectionView.reloadData()
+        discardPileCollectionView.reloadData()
     }
     
     private func listenForGameStateChanges() {
@@ -80,20 +75,35 @@ class Phase10GameViewController: UIViewController {
             return "Score: 0"
         }.subscribe(scoreSubscriber)
         
-        let discardPileSubscriber = Subscribers.Assign(object: topOfPileCardView, keyPath: \.card)
-        Phase10GameEngine.shared.$discardPile.map { $0.last }.subscribe(discardPileSubscriber)
         
         Phase10GameEngine.shared.$discardPile.sink { [weak self] _ in
             self?.saveDiscardPile()
         }
         
-        // save first card
+        Phase10GameEngine.shared.$turnIndex.sink { [weak self] newIndex in
+             let player = Phase10GameEngine.shared.players[newIndex]
+           
+            if self?.player == player {
+                self?.turnWaitingActivityIndicator.stopAnimating()
+            } else {
+                self?.turnWaitingActivityIndicator.startAnimating()
+            }
+        }
+        
+        // save first card in discard pile
+        if let firstCard = Phase10GameEngine.shared.discardPile.first {
+            let record = CKRecord(recordType: Phase10Card.recordType)
+            save(record: record, modelObj: firstCard)
+        }
         
         let handSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         player?.$hand.map { !$0.isEmpty }.subscribe(handSubscriber)
         
         let setSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         player?.$potentialSets.map { !$0.isEmpty }.subscribe(setSubscriber)
+        
+        let discardSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
+        Phase10GameEngine.shared.$discardPile.map { !$0.isEmpty }.subscribe(discardSubscriber)
     }
     
     
@@ -102,6 +112,7 @@ class Phase10GameViewController: UIViewController {
         player = Phase10GameEngine.shared.players.first
         handDataSource = Phase10GameViewDataSource(deckType: .hand, game: Phase10GameEngine.shared)
         setDataSource = Phase10GameViewDataSource(deckType: .set, game: Phase10GameEngine.shared)
+        discardDataSource = Phase10GameViewDataSource(deckType: .discard, game: Phase10GameEngine.shared)
         persistGame()
         setupCollectionViews()
     }
@@ -109,7 +120,7 @@ class Phase10GameViewController: UIViewController {
     private func persistGame() {
         gameRecord = CKRecord(recordType: Phase10GameEngine.recordType)
         gameRecord?[.turnIndex] = 0
-        save(record: gameRecord!)
+        save(record: gameRecord!, modelObj: Phase10GameEngine.shared)
         
         let deck = CKRecord(recordType: Phase10Deck.recordType)
         gameReference = CKRecord.Reference(recordID: gameRecord!.recordID, action: .none)
@@ -137,7 +148,7 @@ class Phase10GameViewController: UIViewController {
         
         gameRecord[.discardPile] = cardReferences
         
-        save(record: gameRecord)
+        save(record: gameRecord, modelObj: Phase10GameEngine.shared)
     }
     
     private func savePlayers(inGame gameReference: CKRecord.Reference?) {
@@ -148,7 +159,7 @@ class Phase10GameViewController: UIViewController {
             let cardRecords: [CKRecord] = player.hand.compactMap { card in
                 let cardRecord = CKRecord(recordType: Phase10Card.recordType)
                 cardRecord[.description] = card.description
-                save(record: cardRecord)
+                save(record: cardRecord, modelObj: card)
                 return cardRecord
             }
            
@@ -158,7 +169,7 @@ class Phase10GameViewController: UIViewController {
             
             playerRecord[.hand] = cardReferences
             playerRecord[Phase10Player.Key.game] = gameReference
-            save(record: playerRecord)
+            save(record: playerRecord, modelObj: player)
         }
     }
     
@@ -168,11 +179,11 @@ class Phase10GameViewController: UIViewController {
             cardRecord[.description] = card.description
             let deckReference = CKRecord.Reference(record: deck, action: .none)
             cardRecord[Phase10Card.Key.deck] = deckReference
-            save(record: cardRecord)
+            save(record: cardRecord, modelObj: card)
         }
     }
     
-    private func save(record: CKRecord) {
+    private func save(record: CKRecord, modelObj: Phase10Model? = nil) {
         database.save(record) { (record, error) in
              if let error = error as? CKError,
                 error.code.rawValue == 9 {
@@ -181,6 +192,7 @@ class Phase10GameViewController: UIViewController {
                 print(Phase10Error.unknown.rawValue)
              } else {
                 print("Saved \(String(describing: record?.recordType))")
+                modelObj?.recordID = record?.recordID
             }
         }
     }
@@ -189,6 +201,8 @@ class Phase10GameViewController: UIViewController {
         self.currentHandCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
         
         self.potentialCardSetCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
+        
+        self.discardPileCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
         
         currentHandCollectionView.delegate = self
         currentHandCollectionView.dataSource = handDataSource
@@ -204,6 +218,13 @@ class Phase10GameViewController: UIViewController {
         potentialCardSetCollectionView.dropDelegate = self
         potentialCardSetCollectionView.dragDelegate = self
         
+        discardPileCollectionView.delegate = self
+        discardPileCollectionView.dataSource = discardDataSource
+        discardPileCollectionView.dragInteractionEnabled = true
+        
+        discardPileCollectionView.dragDelegate = self
+        discardPileCollectionView.dropDelegate = self
+        
         reloadCards()
     }
     
@@ -212,15 +233,7 @@ class Phase10GameViewController: UIViewController {
 extension Phase10GameViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let dataSource = collectionView.dataSource as? Phase10GameViewDataSource,
-            dataSource.deckType == .hand,
-            let card = dataSource.cardAt(indexPath),
-            let player = player else {
-            return
-        }
-        
-        Phase10GameEngine.shared.discardCard(card, player: player)
-        currentHandCollectionView.reloadData()
+        print("tap not implemented yet")
     }
 }
 

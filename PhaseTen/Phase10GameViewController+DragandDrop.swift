@@ -71,9 +71,21 @@ extension Phase10GameViewController: UICollectionViewDropDelegate, UICollectionV
         }
     }
     
+    private func itemForDrag(_ collectionView: UICollectionView, at indexPath: IndexPath) -> Phase10Card? {
+        if collectionView == currentHandCollectionView {
+            return player?.hand[indexPath.row]
+        } else if collectionView == discardPileCollectionView {
+            return Phase10GameEngine.shared.discardPile.last
+        } else if collectionView == potentialCardSetCollectionView {
+            return player?.potentialSets[indexPath.row]
+        }
+        
+        return nil
+    }
+    
     
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        if let itemForDrag =  (collectionView == currentHandCollectionView) ? player?.hand[indexPath.row] : player?.potentialSets[indexPath.row] {
+        if let itemForDrag =  itemForDrag(collectionView, at: indexPath) {
             let itemProvider = NSItemProvider(object: "\(itemForDrag.description)" as NSItemProviderWriting)
             let dragItem = UIDragItem(itemProvider: itemProvider)
     

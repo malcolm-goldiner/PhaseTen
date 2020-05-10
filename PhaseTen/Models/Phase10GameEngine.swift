@@ -9,7 +9,7 @@
 import Foundation
 import Combine
 
-class Phase10GameEngine {
+class Phase10GameEngine: Phase10Model {
     
     static let shared = Phase10GameEngine()
     
@@ -54,7 +54,12 @@ class Phase10GameEngine {
     @Published
     var winningPlayer: Phase10Player?
     
-    init() {
+    @Published
+    var turnIndex: Int = 0
+    
+    override init() {
+        super.init()
+        
         players.forEach { player in
             beginRoundForPlayer(player)
         }
