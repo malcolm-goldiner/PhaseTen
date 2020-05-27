@@ -79,6 +79,7 @@ extension CKRecord {
     }
 }
 
+
 enum Phase10Error: String {
     case auth = "Not signed into iCloud"
     case unknown = "Unknown Error"

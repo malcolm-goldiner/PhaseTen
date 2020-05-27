@@ -26,7 +26,18 @@
 		1F7BD7A7243C445E0083854B /* Phase10BackingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD7A6243C445E0083854B /* Phase10BackingModels.swift */; };
 		1F7BD7A9243C47B00083854B /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7BD7A8243C47B00083854B /* CardView.swift */; };
 		1F7BD7AB243C49780083854B /* CardView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F7BD7AA243C49780083854B /* CardView.xib */; };
+		1FB32665247DF7E60056F6AD /* PhaseTenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB32664247DF7E60056F6AD /* PhaseTenTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1FB32667247DF7E60056F6AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1F7BD7572436DA820083854B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1F7BD75E2436DA820083854B;
+			remoteInfo = PhaseTen;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -51,6 +62,9 @@
 		1F7BD7A6243C445E0083854B /* Phase10BackingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase10BackingModels.swift; sourceTree = "<group>"; };
 		1F7BD7A8243C47B00083854B /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		1F7BD7AA243C49780083854B /* CardView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CardView.xib; sourceTree = "<group>"; };
+		1FB32662247DF7E60056F6AD /* PhaseTenTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhaseTenTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FB32664247DF7E60056F6AD /* PhaseTenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhaseTenTests.swift; sourceTree = "<group>"; };
+		1FB32666247DF7E60056F6AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,9 +76,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1FB3265F247DF7E60056F6AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1F3375882467DC5D00976A86 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				1F7BD7A4243B0BD40083854B /* Phase10GameViewController.swift */,
+				1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */,
+				1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
 		1F5B551B244EBEDF0045F5F5 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -82,6 +113,7 @@
 			children = (
 				1F7BD7782439A95B0083854B /* Phase10GameEngine.swift */,
 				1F7BD7A6243C445E0083854B /* Phase10BackingModels.swift */,
+				1F3375862467D1F400976A86 /* Phase10GameEngineManager.swift */,
 				1F7BD7762436DE0E0083854B /* Phase10Card.swift */,
 				1F5B5522245E880F0045F5F5 /* Phase10Model.swift */,
 			);
@@ -91,6 +123,7 @@
 		1F5B551D244EBF270045F5F5 /* Boiler Plate */ = {
 			isa = PBXGroup;
 			children = (
+				1F5B551E245400C00045F5F5 /* PhaseTen.entitlements */,
 				1F7BD76D2436DA850083854B /* LaunchScreen.storyboard */,
 				1F7BD7622436DA820083854B /* AppDelegate.swift */,
 				1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */,
@@ -110,6 +143,7 @@
 			isa = PBXGroup;
 			children = (
 				1F7BD7612436DA820083854B /* PhaseTen */,
+				1FB32663247DF7E60056F6AD /* PhaseTenTests */,
 				1F7BD7602436DA820083854B /* Products */,
 				1F5B551F245400CB0045F5F5 /* Frameworks */,
 			);
@@ -119,6 +153,7 @@
 			isa = PBXGroup;
 			children = (
 				1F7BD75F2436DA820083854B /* PhaseTen.app */,
+				1FB32662247DF7E60056F6AD /* PhaseTenTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -126,11 +161,7 @@
 		1F7BD7612436DA820083854B /* PhaseTen */ = {
 			isa = PBXGroup;
 			children = (
-				1F5B551E245400C00045F5F5 /* PhaseTen.entitlements */,
-				1F7BD7A4243B0BD40083854B /* Phase10GameViewController.swift */,
-				1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */,
-				1F3375862467D1F400976A86 /* Phase10GameEngineManager.swift */,
-				1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */,
+				1F3375882467DC5D00976A86 /* View Controllers */,
 				1F5B551B244EBEDF0045F5F5 /* UI */,
 				1F5B551C244EBEF40045F5F5 /* Models */,
 				1F7BD7682436DA850083854B /* Assets.xcassets */,
@@ -147,6 +178,15 @@
 				1F7BD76B2436DA850083854B /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		1FB32663247DF7E60056F6AD /* PhaseTenTests */ = {
+			isa = PBXGroup;
+			children = (
+				1FB32664247DF7E60056F6AD /* PhaseTenTests.swift */,
+				1FB32666247DF7E60056F6AD /* Info.plist */,
+			);
+			path = PhaseTenTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -169,18 +209,40 @@
 			productReference = 1F7BD75F2436DA820083854B /* PhaseTen.app */;
 			productType = "com.apple.product-type.application";
 		};
+		1FB32661247DF7E60056F6AD /* PhaseTenTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1FB3266B247DF7E60056F6AD /* Build configuration list for PBXNativeTarget "PhaseTenTests" */;
+			buildPhases = (
+				1FB3265E247DF7E60056F6AD /* Sources */,
+				1FB3265F247DF7E60056F6AD /* Frameworks */,
+				1FB32660247DF7E60056F6AD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1FB32668247DF7E60056F6AD /* PBXTargetDependency */,
+			);
+			name = PhaseTenTests;
+			productName = PhaseTenTests;
+			productReference = 1FB32662247DF7E60056F6AD /* PhaseTenTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		1F7BD7572436DA820083854B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1140;
+				LastSwiftUpdateCheck = 1150;
 				LastUpgradeCheck = 1140;
 				ORGANIZATIONNAME = "Malcolm Goldiner";
 				TargetAttributes = {
 					1F7BD75E2436DA820083854B = {
 						CreatedOnToolsVersion = 11.4;
+					};
+					1FB32661247DF7E60056F6AD = {
+						CreatedOnToolsVersion = 11.5;
+						TestTargetID = 1F7BD75E2436DA820083854B;
 					};
 				};
 			};
@@ -198,6 +260,7 @@
 			projectRoot = "";
 			targets = (
 				1F7BD75E2436DA820083854B /* PhaseTen */,
+				1FB32661247DF7E60056F6AD /* PhaseTenTests */,
 			);
 		};
 /* End PBXProject section */
@@ -213,6 +276,13 @@
 				1F7BD76C2436DA850083854B /* Preview Assets.xcassets in Resources */,
 				1F7BD7692436DA850083854B /* Assets.xcassets in Resources */,
 				1F7BD77D2439CD120083854B /* CardCell.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FB32660247DF7E60056F6AD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -238,7 +308,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1FB3265E247DF7E60056F6AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1FB32665247DF7E60056F6AD /* PhaseTenTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1FB32668247DF7E60056F6AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1F7BD75E2436DA820083854B /* PhaseTen */;
+			targetProxy = 1FB32667247DF7E60056F6AD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		1F7BD76D2436DA850083854B /* LaunchScreen.storyboard */ = {
@@ -408,6 +494,48 @@
 			};
 			name = Release;
 		};
+		1FB32669247DF7E60056F6AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = W36PVYAHBM;
+				INFOPLIST_FILE = PhaseTenTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.malcolmgoldiner.PhaseTenTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PhaseTen.app/PhaseTen";
+			};
+			name = Debug;
+		};
+		1FB3266A247DF7E60056F6AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = W36PVYAHBM;
+				INFOPLIST_FILE = PhaseTenTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.malcolmgoldiner.PhaseTenTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PhaseTen.app/PhaseTen";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -425,6 +553,15 @@
 			buildConfigurations = (
 				1F7BD7742436DA850083854B /* Debug */,
 				1F7BD7752436DA850083854B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1FB3266B247DF7E60056F6AD /* Build configuration list for PBXNativeTarget "PhaseTenTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1FB32669247DF7E60056F6AD /* Debug */,
+				1FB3266A247DF7E60056F6AD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

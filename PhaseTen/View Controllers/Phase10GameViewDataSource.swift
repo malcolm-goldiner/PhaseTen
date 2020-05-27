@@ -128,6 +128,7 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
             Phase10GameEngine.shared.discardPile.append(card)
             player.potentialSets = player.potentialSets.filter { $0 != card }
             player.hand = player.hand.filter { $0 != card }
+            Phase10GameEngine.shared.addActionToTurn(.discard)
         }
     }
     

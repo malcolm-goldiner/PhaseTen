@@ -82,7 +82,7 @@ indirect enum ValidatedCombo: Equatable, Hashable {
     func valid(fromCards cards: [Phase10Card], combo: ValidatedCombo? = nil) -> (Bool, Phase10CardType?) {
         switch self {
         case .setOf(let count):
-            let sorted = cards.sorted(by: { (a: Phase10Card , b: Phase10Card) in a.type.rawValue < b.type.rawValue }).filter { $0.type.value() > Phase10CardType.maxFaceCardValue}
+            let sorted = cards.sorted(by: { (a: Phase10Card , b: Phase10Card) in a.type.rawValue < b.type.rawValue }).filter { $0.type.value() < Phase10CardType.maxFaceCardValue}
             
             var runningCount = 1
             var currentCard = sorted.first?.type
