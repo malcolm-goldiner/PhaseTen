@@ -134,6 +134,8 @@ indirect enum ValidatedCombo: Equatable, Hashable {
                 
                 let lastType = overallLastResult.1
                 
+                let overallCount = updatedCards.filter { $0.type == lastType }.count
+                
                 updatedCards.removeAll(where: { $0.type == lastType })
             }
             
@@ -167,7 +169,10 @@ class Phase10Player: Phase10Model, Equatable, Hashable {
     var hand: [Phase10Card] = []
     
     @Published
-    var potentialSets: [Phase10Card] = []
+    var firstPotentialSet: [Phase10Card] = []
+    
+    @Published
+    var secondPotentialSet: [Phase10Card] = [] 
     
     @Published
     var phase: Phase? =  Phase10GameEngine.generalReqs.first

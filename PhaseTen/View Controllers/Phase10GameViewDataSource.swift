@@ -9,9 +9,14 @@
 import UIKit
 import Combine
 
-enum DeckType {
+enum SetSection {
+    case top
+    case bottom
+}
+
+enum DeckType: Equatable {
     case hand
-    case set
+    case set(order: SetSection)
     case discard
 }
 
@@ -35,9 +40,16 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
             return player.hand[indexPath.row]
         } else if deckType == .discard {
             return Phase10GameEngine.shared.discardPile.last
-        } else {
-            return player.potentialSets[indexPath.row]
+        } else if case DeckType.set(let order) = deckType {
+            switch order {
+            case .top:
+                return player.firstPotentialSet[indexPath.row]
+            case .bottom:
+                return player.secondPotentialSet[indexPath.row]
+            }
         }
+        
+        return nil 
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -45,8 +57,10 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
             return 0
         }
         
-        if deckType == .set {
-            return player.potentialSets.count
+        if case DeckType.set(let order) = deckType, order == .top {
+            return player.firstPotentialSet.count
+        } else if case DeckType.set(let order) = deckType, order == .bottom {
+            return player.secondPotentialSet.count
         } else if deckType == .discard {
             return Phase10GameEngine.shared.discardPile.isEmpty ? 0 : 1
         } else {
@@ -70,8 +84,12 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
         }
         
         switch deckType {
-        case .set:
-            player.potentialSets.append(card)
+        case .set(let order):
+            if order == .bottom {
+                player.secondPotentialSet.append(card)
+            } else {
+                player.firstPotentialSet.append(card)
+            }
         case .discard:
             Phase10GameEngine.shared.discardPile.append(card)
         case .hand:
@@ -89,7 +107,7 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
         case .hand:
             destination = player?.hand
         case .set:
-            destination = player?.potentialSets
+            destination = player?.firstPotentialSet
         case .discard:
             destination = Phase10GameEngine.shared.discardPile
         }
@@ -98,7 +116,7 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
         case .hand:
             source = player?.hand
         case .set:
-            source = player?.potentialSets
+            source = player?.firstPotentialSet
         case .discard:
             source = Phase10GameEngine.shared.discardPile
             
@@ -110,25 +128,43 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
         }
     }
     
-    func acceptDraggedCard(_ card: Phase10Card, to destinationIndex: Int?) {
+    private func removeCard(_ card: Phase10Card, from deck: DeckType) {
         guard let player = player else {
             return
         }
         
-        switch deckType {
-        case .set:
-            player.potentialSets.append(card)
+        switch deck {
+        case .hand:
             player.hand = player.hand.filter { $0 != card }
+        case .set(order: let order):
+            if order == .top {
+                player.firstPotentialSet = player.firstPotentialSet.filter { $0 != card }
+            } else if order == .bottom {
+                player.secondPotentialSet = player.secondPotentialSet.filter { $0 != card }
+            }
+        case .discard:
             Phase10GameEngine.shared.discardPile.removeLast()
+        }
+    }
+    
+    func acceptDraggedCard(_ card: Phase10Card, from deck: DeckType, to destinationIndex: Int?) {
+        guard let player = player else {
+            return
+        }
+        
+        removeCard(card, from: deck)
+        
+        switch deckType {
+        case .set(let order):
+            if order == .top {
+                player.firstPotentialSet.append(card)
+            } else if order == .bottom {
+                player.secondPotentialSet.append(card)
+            }
         case .hand:
             player.hand.append(card)
-            player.potentialSets = player.potentialSets.filter { $0 != card }
-            Phase10GameEngine.shared.discardPile.removeLast()
         case .discard:
             Phase10GameEngine.shared.discardPile.append(card)
-            player.potentialSets = player.potentialSets.filter { $0 != card }
-            player.hand = player.hand.filter { $0 != card }
-            Phase10GameEngine.shared.addActionToTurn(.discard)
         }
     }
     

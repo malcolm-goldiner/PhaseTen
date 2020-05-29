@@ -19,7 +19,13 @@ class Phase10GameViewController: UIViewController {
     
     @IBOutlet weak var discardPileCollectionView: UICollectionView!
     
-    @IBOutlet weak var potentialCardSetCollectionView: UICollectionView!
+    @IBOutlet weak var topPotentialCardSetCollectionView: UICollectionView!
+    
+    @IBOutlet weak var bottomPotentialCardSetCollectionView: UICollectionView!
+    
+    @IBOutlet weak var topPotentialComboLabel: UILabel!
+    
+    @IBOutlet weak var bottomPotentialComboLabel: UILabel!
     
     @IBOutlet weak var currentHandCollectionView: UICollectionView!
     
@@ -43,6 +49,8 @@ class Phase10GameViewController: UIViewController {
     
     var setDataSource: Phase10GameViewDataSource?
     
+    var secondSetDataSource: Phase10GameViewDataSource?
+    
     var discardDataSource: Phase10GameViewDataSource?
     
     var gameManager: Phase10GameEngineManager?
@@ -56,7 +64,8 @@ class Phase10GameViewController: UIViewController {
     
     private func reloadCards() {
         currentHandCollectionView.reloadData()
-        potentialCardSetCollectionView.reloadData()
+        topPotentialCardSetCollectionView.reloadData()
+        bottomPotentialCardSetCollectionView.reloadData()
         discardPileCollectionView.reloadData()
     }
     
@@ -86,7 +95,10 @@ class Phase10GameViewController: UIViewController {
         player.$hand.map { !$0.isEmpty }.subscribe(handSubscriber)
         
         let setSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
-        player.$potentialSets.map { !$0.isEmpty }.subscribe(setSubscriber)
+        player.$firstPotentialSet.map { !$0.isEmpty }.subscribe(setSubscriber)
+        
+        let secondSetSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
+        player.$secondPotentialSet.map { !$0.isEmpty }.subscribe(secondSetSubscriber)
         
         let discardSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         Phase10GameEngine.shared.$discardPile.map { !$0.isEmpty }.subscribe(discardSubscriber)
@@ -96,7 +108,8 @@ class Phase10GameViewController: UIViewController {
         Phase10GameEngine.shared.addPlayer()
         player = Phase10GameEngine.shared.players.first
         handDataSource = Phase10GameViewDataSource(deckType: .hand, game: Phase10GameEngine.shared)
-        setDataSource = Phase10GameViewDataSource(deckType: .set, game: Phase10GameEngine.shared)
+        setDataSource = Phase10GameViewDataSource(deckType: .set(order: .top), game: Phase10GameEngine.shared)
+        secondSetDataSource = Phase10GameViewDataSource(deckType: .set(order: .bottom), game: Phase10GameEngine.shared)
         discardDataSource = Phase10GameViewDataSource(deckType: .discard, game: Phase10GameEngine.shared)
         gameManager?.persistGame()
         setupCollectionViews()
@@ -105,7 +118,9 @@ class Phase10GameViewController: UIViewController {
     private func setupCollectionViews() {
         self.currentHandCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
         
-        self.potentialCardSetCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
+        self.bottomPotentialCardSetCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
+        
+        self.topPotentialCardSetCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
         
         self.discardPileCollectionView.register(UINib(nibName: CardCollectionViewCell.nibName, bundle: Bundle.main), forCellWithReuseIdentifier: CardCollectionViewCell.reuseIdenitifer)
         
@@ -113,15 +128,22 @@ class Phase10GameViewController: UIViewController {
         currentHandCollectionView.dataSource = handDataSource
         currentHandCollectionView.dragInteractionEnabled = true
         
-        potentialCardSetCollectionView.delegate = self
-        potentialCardSetCollectionView.dataSource = setDataSource
-        potentialCardSetCollectionView.dragInteractionEnabled = true
+        bottomPotentialCardSetCollectionView.delegate = self
+        bottomPotentialCardSetCollectionView.dataSource = secondSetDataSource
+        bottomPotentialCardSetCollectionView.dragInteractionEnabled = true
+        
+        topPotentialCardSetCollectionView.delegate = self
+        topPotentialCardSetCollectionView.dataSource = setDataSource
+        topPotentialCardSetCollectionView.dragInteractionEnabled = true
         
         currentHandCollectionView.dragDelegate = self
         currentHandCollectionView.dropDelegate = self
         
-        potentialCardSetCollectionView.dropDelegate = self
-        potentialCardSetCollectionView.dragDelegate = self
+        bottomPotentialCardSetCollectionView.dropDelegate = self
+        bottomPotentialCardSetCollectionView.dragDelegate = self
+        
+        topPotentialCardSetCollectionView.dropDelegate = self
+        topPotentialCardSetCollectionView.dragDelegate = self
         
         discardPileCollectionView.delegate = self
         discardPileCollectionView.dataSource = discardDataSource
