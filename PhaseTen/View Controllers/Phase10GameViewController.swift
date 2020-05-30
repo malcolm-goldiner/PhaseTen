@@ -113,6 +113,12 @@ class Phase10GameViewController: UIViewController {
         discardDataSource = Phase10GameViewDataSource(deckType: .discard, game: Phase10GameEngine.shared)
         gameManager?.persistGame()
         setupCollectionViews()
+        
+        if let phase = player?.phase {
+            let splitDesc = phase.description().split(separator: " ")
+            topPotentialComboLabel.text = splitDesc.first?.description
+            bottomPotentialComboLabel.text = splitDesc.last?.description
+        }
     }
     
     private func setupCollectionViews() {

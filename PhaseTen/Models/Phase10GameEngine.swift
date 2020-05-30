@@ -36,7 +36,7 @@ class Phase10GameEngine: Phase10Model {
         .seven(requirements: [.numberOf(count: 2, combos: .setOf(count: 4))]),
         .eight(requirements: [.numberOfColor(count: 7)]),
         .nine(requirements: [.setOf(count: 5), .setOf(count: 2)]),
-        .ten(requirements: [.setOf(count: 5), .setOf(count: 2)])
+        .ten(requirements: [.setOf(count: 5), .setOf(count: 3)])
     ]
     
     @Published
@@ -113,6 +113,7 @@ class Phase10GameEngine: Phase10Model {
             beginRoundForPlayer(player)
             
             if player != winningPlayer {
+                // not here
                 scoresByPlayer[player, default: 0] += player.hand.reduce(0) { $0 + $1.type.rawValue }
             }
         }
@@ -138,7 +139,8 @@ class Phase10GameEngine: Phase10Model {
         deck.cards.removeSubrange(0...9)
     }
     
-    func validatePhase(for player: Phase10Player, playedCards: [Phase10Card]) -> Bool {
+    func isPhaseCleared(for player: Phase10Player,
+                        playedCards: [[Phase10Card]]) -> Bool {
         var result = false
         
         switch player.phase {
@@ -152,14 +154,29 @@ class Phase10GameEngine: Phase10Model {
              .eight(let requirements),
              .nine(let requirements),
              .ten(let requirements):
-            result =  requirements.reduce(true) { $0 && $1.valid(fromCards: playedCards).0 }
+            
+            for index in 0..<requirements.count {
+                print(requirements[index].description())
+                switch requirements[index] {
+                case .numberOf(_, _) where requirements.count == 1:
+                    result = requirements[index].valid(fromCards: playedCards.reduce([], +)).0
+                default:
+                    result = requirements[index].valid(fromCards: playedCards[index]).0
+                }
+            }
         default:
             result =  false
         }
         
+        return result
+    }
+    
+    func validatePhase(for player: Phase10Player, playedCards: [[Phase10Card]]) -> Bool {
+        let result = isPhaseCleared(for: player, playedCards: playedCards)
         if result {
             movePlayerToNextPhase(player)
-            discardPile.append(contentsOf: playedCards)
+            discardPile.append(contentsOf: playedCards.first!)
+            discardPile.append(contentsOf: playedCards.last!)
             winningPlayer = player
         }
         

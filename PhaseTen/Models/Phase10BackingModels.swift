@@ -55,6 +55,14 @@ enum Phase: Equatable, Hashable {
         }
     }
     
+    func description() -> String {
+        guard let requirements = requirements() else {
+            return ""
+        }
+        
+        return requirements.reduce("") { $0 + $1.description() }
+    }
+    
     func hash(into hasher: inout Hasher) {
         hasher.combine(name())
         hasher.combine(requirements())
@@ -79,6 +87,19 @@ indirect enum ValidatedCombo: Equatable, Hashable {
     case numberOfColor(count: Int)
     case numberOf(count:Int, combos: ValidatedCombo)
     
+    func description() -> String {
+        switch self {
+        case .setOf(let count):
+            return "Set of \(count)"
+        case .runOf(let count):
+            return "Run of \(count)"
+        case .numberOfColor(let count):
+            return "\(count) of Color"
+        case .numberOf(let count, let combo):
+            return "\(count) of \(combo.description())"
+        }
+    }
+    
     func valid(fromCards cards: [Phase10Card], combo: ValidatedCombo? = nil) -> (Bool, Phase10CardType?) {
         switch self {
         case .setOf(let count):
@@ -100,23 +121,18 @@ indirect enum ValidatedCombo: Equatable, Hashable {
                 }
             }
         case .runOf(count: let count):
-            let sorted = Array(Set(cards)).sorted(by: { (a: Phase10Card , b: Phase10Card) in a.type.rawValue < b.type.rawValue }).filter { $0.type.value() > Phase10CardType.maxFaceCardValue}
-            
-            for i in 0..<sorted.count {
-                var runningCount = 1
-                var runner = i + 1
-                
-                while runningCount < count && runner < sorted.count {
-                    if sorted[runner].type.value() == sorted[runner - 1].type.value() + 1 {
-                        runningCount += 1
-                        runner += 1
-                    }
-                    
-                    break
+            let sorted = Array(Set(cards)).sorted(by: { (a: Phase10Card , b: Phase10Card) in a.type.rawValue < b.type.rawValue }).filter { $0.type.value() < Phase10CardType.maxFaceCardValue}
+            var runningCount = 1
+            var runner = 1
+           
+            for _ in 0..<(sorted.count - 1) {
+                if sorted[runner].type.value() == sorted[runner - 1].type.value() + 1 {
+                    runningCount += 1
+                    runner += 1
                 }
-                
-                return (runningCount >= count, sorted[runner].type)
             }
+            
+            return (runningCount >= count, sorted[runner - 1].type)
         case.numberOfColor(let count):
             let uniqueColors = Array(Set(cards.map { $0.color }))
             return (uniqueColors.map { (color) in cards.filter { $0.color == color }.count }.contains(count), nil)
@@ -133,9 +149,6 @@ indirect enum ValidatedCombo: Equatable, Hashable {
                 }
                 
                 let lastType = overallLastResult.1
-                
-                let overallCount = updatedCards.filter { $0.type == lastType }.count
-                
                 updatedCards.removeAll(where: { $0.type == lastType })
             }
             
