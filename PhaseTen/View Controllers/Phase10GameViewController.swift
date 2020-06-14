@@ -35,6 +35,19 @@ class Phase10GameViewController: UIViewController {
         didSet {
             if needsReload {
                 reloadCards()
+                
+                if Phase10GameEngine.shared.players[Phase10GameEngine.shared.turnIndex] != player {
+                    turnWaitingActivityIndicator.startAnimating()
+                }
+            }
+        }
+    }
+    
+    var reactiveUpdatedSets: [[Phase10Card]]? = nil {
+        didSet {
+            if reactiveUpdatedSets?.filter({ !$0.isEmpty }).isEmpty == false,
+                let player = player {
+                validatePhase(withSets: reactiveUpdatedSets!, forPlayer: player)
             }
         }
     }
@@ -79,6 +92,7 @@ class Phase10GameViewController: UIViewController {
             self?.gameManager?.saveDiscardPile()
         }
         
+        // seems to run on first launch only
         _ = Phase10GameEngine.shared.$turnIndex.sink { [weak self] newIndex in
             let player = Phase10GameEngine.shared.players[newIndex]
             
@@ -96,12 +110,33 @@ class Phase10GameViewController: UIViewController {
         
         let setSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         player.$firstPotentialSet.map { !$0.isEmpty }.subscribe(setSubscriber)
-        
+
         let secondSetSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         player.$secondPotentialSet.map { !$0.isEmpty }.subscribe(secondSetSubscriber)
         
+        let validationSubscriber = Subscribers.Assign(object: self, keyPath: \.reactiveUpdatedSets)
+        player.$firstPotentialSet.combineLatest(player.$secondPotentialSet).map { [$0, $1] }.subscribe(validationSubscriber)
+        
         let discardSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         Phase10GameEngine.shared.$discardPile.map { !$0.isEmpty }.subscribe(discardSubscriber)
+        
+        let turnSub = Subscribers.Assign(object: self, keyPath: \.needsReload)
+        Phase10GameEngine.shared.$turnIndex.map { Phase10GameEngine.shared.players[$0] != player }.subscribe(turnSub)
+    }
+    
+    private func validatePhase(withSets combinedSets: [[Phase10Card]], forPlayer player: Phase10Player) {
+        let cleared = Phase10GameEngine.shared.validatePhase(for: player, playedCards: combinedSets)
+        
+        if cleared {
+            Phase10GameEngine.shared.movePlayerToNextPhase(player)
+            
+            let alertController = UIAlertController(title: "Phase Cleared!", message: "You've moved onto the next Phase", preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "Great!", style: .default, handler: { [weak self] _ in
+                alertController.dismiss(animated: true, completion: nil)
+            }))
+            
+            present(alertController, animated: true, completion: nil)
+        }
     }
 
     private func startGame() {

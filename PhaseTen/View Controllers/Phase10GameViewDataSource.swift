@@ -163,8 +163,14 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
             }
         case .hand:
             player.hand.append(card)
+            
+            if deck == .discard {
+                Phase10GameEngine.shared.addActionToTurn(.pickup(card: card))
+            }
+            
         case .discard:
             Phase10GameEngine.shared.discardPile.append(card)
+            Phase10GameEngine.shared.addActionToTurn(.discard(card: card))
         }
     }
     

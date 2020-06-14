@@ -90,19 +90,15 @@ class Phase10GameEngine: Phase10Model {
     }
     
     func addActionToTurn(_ action: Phase10Action) {
-        if currentTurn == nil || currentTurn?.actions.contains(action) == false {
-            if currentTurn != nil {
-                currentTurn?.actions.append(action)
-            } else {
-                currentTurn = Phase10Turn(actions: [action])
-            }
-            
-            if currentTurn?.actions.count == 2 {
-                turnIndex += 1
-                currentTurn = nil
-            }
-        } else {
-            assertionFailure("Two of the same actiona aren't allowed in one turn ")
+        if currentTurn == nil {
+            currentTurn = Phase10Turn()
+        }
+        
+        currentTurn?.addAction(action)
+        
+        if currentTurn?.isComplete == true {
+            turnIndex += 1
+            currentTurn = nil
         }
     }
     

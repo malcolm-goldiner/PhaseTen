@@ -199,15 +199,44 @@ class Phase10Player: Phase10Model, Equatable, Hashable {
     
 }
 
-enum Phase10Action {
-    case discard
-    case pickup
+enum Phase10Action: Equatable {
+    case discard(card: Phase10Card)
+    case pickup(card: Phase10Card)
+    
+    static func forSameCard(lhs: Phase10Action, rhs: Phase10Action) -> Bool {
+        if case .pickup(let cardA) = lhs, case .discard(let cardB) = rhs {
+            return cardA == cardB
+        } else  if case .pickup(let cardA) = lhs, case .pickup(let cardB) = rhs {
+            return cardA == cardB
+        } else if case .discard(let cardA) = lhs, case .discard(let cardB) = rhs {
+            return cardA == cardB
+        } else if case .discard(let cardA) = lhs, case .pickup(let cardB) = rhs {
+            return cardA == cardB
+        }
+        
+        return false
+    }
 }
 
 struct Phase10Turn {
-    var actions: [Phase10Action]
+    var discardAction: Phase10Action?
+    
+    var pickupAction: Phase10Action?
     
     var isComplete : Bool {
-        return (actions.count == 2) && actions.first != actions[1]
+        if let discardAction = discardAction,
+            let pickupAction = pickupAction {
+            return !Phase10Action.forSameCard(lhs: discardAction, rhs: pickupAction)
+        }
+        
+        return false
+    }
+    
+    mutating func addAction(_ action: Phase10Action) {
+        if case .discard(_) = action {
+            discardAction = action
+        } else if case .pickup(_) = action {
+            pickupAction = action
+        }
     }
 }
