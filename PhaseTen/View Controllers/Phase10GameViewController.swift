@@ -36,7 +36,8 @@ class Phase10GameViewController: UIViewController {
             if needsReload {
                 reloadCards()
                 
-                if Phase10GameEngine.shared.players[Phase10GameEngine.shared.turnIndex] != player {
+                if Phase10GameEngine.shared.players[Phase10GameEngine.shared.turnIndex] != player ||
+                   Phase10GameEngine.shared.players.count != Phase10GameEngine.shared.expectedNumberOfPlayers {
                     turnWaitingActivityIndicator.startAnimating()
                 }
             }
@@ -129,6 +130,10 @@ class Phase10GameViewController: UIViewController {
         
         let turnSub = Subscribers.Assign(object: self, keyPath: \.needsReload)
         Phase10GameEngine.shared.$turnIndex.map { Phase10GameEngine.shared.players[$0] != player }.subscribe(turnSub)
+        
+        let inviteSub = Subscribers.Assign(object: self, keyPath: \.needsReload)
+        Phase10GameEngine.shared.$expectedNumberOfPlayers.map { $0 != nil }.subscribe(inviteSub)
+        
     }
     
     private func validatePhase(withSets combinedSets: [[Phase10Card]], forPlayer player: Phase10Player) {
@@ -138,7 +143,7 @@ class Phase10GameViewController: UIViewController {
             Phase10GameEngine.shared.movePlayerToNextPhase(player)
             
             let alertController = UIAlertController(title: "Phase Cleared!", message: "You've moved onto the next Phase", preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "Great!", style: .default, handler: { [weak self] _ in
+            alertController.addAction(UIAlertAction(title: "Great!", style: .default, handler: { _ in
                 alertController.dismiss(animated: true, completion: nil)
             }))
             
@@ -159,6 +164,33 @@ class Phase10GameViewController: UIViewController {
         // If we are joining a game already in progress we don't need to do this
         if gameManager.isOriginatingUser == true {
             gameManager.persistGame()
+            
+            // This could come through before it has been saved
+            if let name = gameManager.gameRecord?.recordID.recordName {
+                UIPasteboard.general.string = name
+            }
+            
+            DispatchQueue.main.async { [weak self] in
+                let clipboardAlert = UIAlertController(title: "Game Info Copied",
+                                  message: "Game ID coppied to clipboard, send this to all the people who you want to join!",
+                                  preferredStyle: .alert)
+                
+                clipboardAlert.addTextField { (textField) in
+                    textField.placeholder = "2"
+                    textField.keyboardType = .numberPad
+                }
+
+                clipboardAlert.addAction(UIAlertAction(title: "Enter", style: .default, handler: { [weak clipboardAlert] (_) in
+                    guard let enteredText = clipboardAlert?.textFields?.first?.text,
+                          let numPlayers = Int(enteredText) else {
+                        return
+                    }
+                    
+                    Phase10GameEngine.shared.expectedNumberOfPlayers = numPlayers
+                }))
+
+                self?.present(clipboardAlert, animated: true, completion: nil)
+            }
         }
         
         setupCollectionViews()

@@ -79,6 +79,9 @@ class Phase10GameEngine: Phase10Model {
     
     var winningPlayerIndex: Int?
     
+    @Published
+    var expectedNumberOfPlayers: Int?
+    
     private var needsToDealInLocalPlayer: Bool = false {
         didSet {
             if needsToDealInLocalPlayer,
