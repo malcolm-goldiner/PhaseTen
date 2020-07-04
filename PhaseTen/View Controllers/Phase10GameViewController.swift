@@ -66,7 +66,7 @@ class Phase10GameViewController: UIViewController {
     
     var discardDataSource: Phase10GameViewDataSource?
     
-    var gameManager: Phase10GameEngineManager?
+    var gameManager = Phase10GameEngineManager.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -76,20 +76,25 @@ class Phase10GameViewController: UIViewController {
     }
     
     private func reloadCards() {
-        currentHandCollectionView.reloadData()
-        topPotentialCardSetCollectionView.reloadData()
-        bottomPotentialCardSetCollectionView.reloadData()
-        discardPileCollectionView.reloadData()
+        DispatchQueue.main.async { [weak self] in
+            self?.currentHandCollectionView.reloadData()
+            self?.topPotentialCardSetCollectionView.reloadData()
+            self?.bottomPotentialCardSetCollectionView.reloadData()
+            self?.discardPileCollectionView.reloadData()
+        }
     }
     
     private func listenForGameStateChanges() {
         guard let player = player else {
             return
         }
-        gameManager?.listenToScoreChanges(onLabel: scoreLabel, forPlayer: player)
         
-        _ = Phase10GameEngine.shared.$discardPile.sink { [weak self] _ in
-            self?.gameManager?.saveDiscardPile()
+        gameManager.listenToScoreChanges(onLabel: scoreLabel, forPlayer: player)
+        
+        if gameManager.isOriginatingUser {
+            _ = Phase10GameEngine.shared.$discardPile.sink { [weak self] _ in
+                self?.gameManager.saveDiscardPile()
+            }
         }
         
         // seems to run on first launch only
@@ -103,7 +108,9 @@ class Phase10GameViewController: UIViewController {
             }
         }
         
-        gameManager?.saveFirstCard()
+        if gameManager.isOriginatingUser {
+             gameManager.saveFirstCard()
+        }
         
         let handSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         player.$hand.map { !$0.isEmpty }.subscribe(handSubscriber)
@@ -140,13 +147,20 @@ class Phase10GameViewController: UIViewController {
     }
 
     private func startGame() {
+        // what if the players are still being loaded in?
         Phase10GameEngine.shared.addPlayer()
-        player = Phase10GameEngine.shared.players.first
+        player = Phase10GameEngine.shared.players.first(where: { $0.isGameOwner })
         handDataSource = Phase10GameViewDataSource(deckType: .hand, game: Phase10GameEngine.shared)
         setDataSource = Phase10GameViewDataSource(deckType: .set(order: .top), game: Phase10GameEngine.shared)
         secondSetDataSource = Phase10GameViewDataSource(deckType: .set(order: .bottom), game: Phase10GameEngine.shared)
         discardDataSource = Phase10GameViewDataSource(deckType: .discard, game: Phase10GameEngine.shared)
-        gameManager?.persistGame()
+       
+        
+        // If we are joining a game already in progress we don't need to do this
+        if gameManager.isOriginatingUser == true {
+            gameManager.persistGame()
+        }
+        
         setupCollectionViews()
         
         if let phase = player?.phase {

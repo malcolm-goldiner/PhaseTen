@@ -7,9 +7,11 @@
 //
 
 import CloudKit
+import Combine
 
 class Phase10Model {
     
+    @Published
     var recordID: CKRecord.ID?
     
     func save(record: CKRecord) {

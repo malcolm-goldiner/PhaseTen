@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1F08F2DE2442DBC8002CD470 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */; };
 		1F3375872467D1F400976A86 /* Phase10GameEngineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F3375862467D1F400976A86 /* Phase10GameEngineManager.swift */; };
+		1F480A422495F66800ACE869 /* Phase10GamePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F480A412495F66800ACE869 /* Phase10GamePickerViewController.swift */; };
 		1F5B5518244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */; };
 		1F5B551A244EBE720045F5F5 /* Phase10GameViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */; };
 		1F5B5521245400CB0045F5F5 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5B5520245400CB0045F5F5 /* CloudKit.framework */; };
@@ -41,7 +42,9 @@
 
 /* Begin PBXFileReference section */
 		1F08F2DD2442DBC8002CD470 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		1F2A40A82496032E00C85C60 /* PhaseTenDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PhaseTenDebug.entitlements; sourceTree = "<group>"; };
 		1F3375862467D1F400976A86 /* Phase10GameEngineManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase10GameEngineManager.swift; sourceTree = "<group>"; };
+		1F480A412495F66800ACE869 /* Phase10GamePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase10GamePickerViewController.swift; sourceTree = "<group>"; };
 		1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Phase10GameViewController+DragandDrop.swift"; sourceTree = "<group>"; };
 		1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase10GameViewDataSource.swift; sourceTree = "<group>"; };
 		1F5B551E245400C00045F5F5 /* PhaseTen.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PhaseTen.entitlements; sourceTree = "<group>"; };
@@ -92,6 +95,7 @@
 				1F7BD7A4243B0BD40083854B /* Phase10GameViewController.swift */,
 				1F5B5519244EBE720045F5F5 /* Phase10GameViewDataSource.swift */,
 				1F5B5517244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift */,
+				1F480A412495F66800ACE869 /* Phase10GamePickerViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -161,6 +165,7 @@
 		1F7BD7612436DA820083854B /* PhaseTen */ = {
 			isa = PBXGroup;
 			children = (
+				1F2A40A82496032E00C85C60 /* PhaseTenDebug.entitlements */,
 				1F3375882467DC5D00976A86 /* View Controllers */,
 				1F5B551B244EBEDF0045F5F5 /* UI */,
 				1F5B551C244EBEF40045F5F5 /* Models */,
@@ -300,6 +305,7 @@
 				1F5B5518244EBE3C0045F5F5 /* Phase10GameViewController+DragandDrop.swift in Sources */,
 				1F7BD7A7243C445E0083854B /* Phase10BackingModels.swift in Sources */,
 				1F3375872467D1F400976A86 /* Phase10GameEngineManager.swift in Sources */,
+				1F480A422495F66800ACE869 /* Phase10GamePickerViewController.swift in Sources */,
 				1F7BD7A9243C47B00083854B /* CardView.swift in Sources */,
 				1F5B551A244EBE720045F5F5 /* Phase10GameViewDataSource.swift in Sources */,
 				1F7BD7632436DA820083854B /* AppDelegate.swift in Sources */,
@@ -456,7 +462,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = PhaseTen/PhaseTen.entitlements;
+				CODE_SIGN_ENTITLEMENTS = PhaseTen/PhaseTenDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"PhaseTen/Preview Content\"";
 				DEVELOPMENT_TEAM = W36PVYAHBM;

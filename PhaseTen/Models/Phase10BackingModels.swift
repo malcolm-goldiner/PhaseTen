@@ -68,6 +68,37 @@ enum Phase: Equatable, Hashable {
         hasher.combine(requirements())
     }
     
+    static func phase(from phase: Int) -> Phase? {
+        guard let reqs = Phase10GameEngine.generalReqs[phase].requirements() else {
+            return nil
+        }
+        
+        switch phase {
+        case 0:
+            return .one(requirements: reqs)
+        case 1:
+            return .two(requirements: reqs)
+        case 2:
+            return .three(requirements: reqs)
+        case 3:
+            return .four(requirements: reqs)
+        case 4:
+            return .five(requirements: reqs)
+        case 5:
+            return .six(requirements: reqs)
+        case 6:
+            return .seven(requirements: reqs)
+        case 7:
+            return .eight(requirements: reqs)
+        case 8:
+            return .nine(requirements: reqs)
+        case 9:
+            return .ten(requirements: reqs)
+        default:
+            return nil
+        }
+    }
+    
     case one(requirements: [ValidatedCombo])
     case two(requirements: [ValidatedCombo])
     case three(requirements: [ValidatedCombo])
@@ -168,6 +199,7 @@ class Phase10Player: Phase10Model, Equatable, Hashable {
         case hand = "hand"
         case phase = "phase"
         case game = "game"
+        case index = "index"
     }
     
     static let recordType = "Player"
@@ -177,6 +209,10 @@ class Phase10Player: Phase10Model, Equatable, Hashable {
     }
     
     var name: String?
+    
+    var isGameOwner: Bool = false
+    
+    var index: Int
     
     @Published
     var hand: [Phase10Card] = []
@@ -189,6 +225,12 @@ class Phase10Player: Phase10Model, Equatable, Hashable {
     
     @Published
     var phase: Phase? =  Phase10GameEngine.generalReqs.first
+    
+    init(name: String, phase: Int, index: Int) {
+        self.name = name
+        self.phase = Phase.phase(from: phase)
+        self.index = index
+    }
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(hand)

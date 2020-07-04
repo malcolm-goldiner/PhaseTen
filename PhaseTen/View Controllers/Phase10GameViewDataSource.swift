@@ -166,11 +166,13 @@ class Phase10GameViewDataSource: NSObject, UICollectionViewDataSource {
             
             if deck == .discard {
                 Phase10GameEngine.shared.addActionToTurn(.pickup(card: card))
+                card.placeIndex = -1
             }
-            
+            // do we need hand and set place indicies?
         case .discard:
             Phase10GameEngine.shared.discardPile.append(card)
             Phase10GameEngine.shared.addActionToTurn(.discard(card: card))
+            card.placeIndex = Phase10GameEngine.shared.discardPile.count
         }
     }
     

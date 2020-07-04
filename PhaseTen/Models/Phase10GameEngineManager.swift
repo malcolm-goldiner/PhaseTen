@@ -12,7 +12,7 @@ import CloudKit
 
 class Phase10GameEngineManager {
     
-    let shared = Phase10GameEngineManager()
+    static let shared = Phase10GameEngineManager()
     
     let database = CKContainer.default().publicCloudDatabase
     
@@ -20,7 +20,13 @@ class Phase10GameEngineManager {
     
     var gameRecord: CKRecord?
     
+    var isOriginatingUser = true
     
+    /**
+        Creates Phase10Game, Phase10Deck, and Phase10Card Entities for all the locally created objects in the shared Game Engine
+     
+        Warning: This creates a new game object and will replace any recordID already tied to this Phase10Game
+     */
     public func persistGame() {
         gameRecord = CKRecord(recordType: Phase10GameEngine.recordType)
         
@@ -61,6 +67,7 @@ class Phase10GameEngineManager {
     }
     
     private func savePlayers(inGame gameReference: CKRecord.Reference?) {
+        var index = 0
         Phase10GameEngine.shared.players.forEach { player in
             let playerRecord = CKRecord(recordType: Phase10Player.recordType)
             playerRecord[.name] = player.name
@@ -78,17 +85,22 @@ class Phase10GameEngineManager {
             
             playerRecord[.hand] = cardReferences
             playerRecord[Phase10Player.Key.game] = gameReference
+            playerRecord[.index] = index
             player.save(record: playerRecord)
+            index += 1
         }
     }
     
     private func saveCards(_ deck: CKRecord, withCards cards: [Phase10Card]) {
+        var place = 0
         cards.forEach { card in
             let cardRecord = CKRecord(recordType: Phase10Card.recordType)
             cardRecord[.description] = card.description
+            cardRecord[.placeIndex] = place
             let deckReference = CKRecord.Reference(record: deck, action: .none)
             cardRecord[Phase10Card.Key.deck] = deckReference
             card.save(record: cardRecord)
+            place += 1
         }
     }
     

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CloudKit
 
 enum Phase10CardType: Int, CaseIterable {
     case one
@@ -56,6 +57,7 @@ class Phase10Card: Phase10Model, Hashable, Equatable {
         case type = "type"
         case description = "description"
         case deck = "deck"
+        case placeIndex = "placeIndex"
     }
     
     static func == (lhs: Phase10Card, rhs: Phase10Card) -> Bool {
@@ -69,6 +71,8 @@ class Phase10Card: Phase10Model, Hashable, Equatable {
     let type: Phase10CardType
     
     let color: UIColor?
+    
+    var placeIndex: Int?
     
     var description: String {
         var desc: String = ""
@@ -114,7 +118,7 @@ class Phase10Deck: Phase10Model {
     
     var cards: [Phase10Card]
     
-    override init() {
+    init(recordID: CKRecord.ID? = nil) {
         var buildingCards = [Phase10Card]()
         
         for type in Phase10CardType.allCases {
@@ -130,6 +134,9 @@ class Phase10Deck: Phase10Model {
             }
         }
         
+        
         self.cards = buildingCards.shuffled()
+        super.init()
+        self.recordID = recordID
     }
 }
