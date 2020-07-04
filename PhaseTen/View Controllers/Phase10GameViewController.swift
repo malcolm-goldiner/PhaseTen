@@ -76,6 +76,12 @@ class Phase10GameViewController: UIViewController {
         listenForGameStateChanges()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        needsReload = true 
+    }
+    
     private func reloadCards() {
         DispatchQueue.main.async { [weak self] in
             self?.currentHandCollectionView.reloadData()
@@ -133,7 +139,6 @@ class Phase10GameViewController: UIViewController {
         
         let inviteSub = Subscribers.Assign(object: self, keyPath: \.needsReload)
         Phase10GameEngine.shared.$expectedNumberOfPlayers.map { $0 != nil }.subscribe(inviteSub)
-        
     }
     
     private func validatePhase(withSets combinedSets: [[Phase10Card]], forPlayer player: Phase10Player) {

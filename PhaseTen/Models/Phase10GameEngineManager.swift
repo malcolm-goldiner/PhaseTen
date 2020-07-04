@@ -20,7 +20,7 @@ class Phase10GameEngineManager {
     
     var gameRecord: CKRecord?
     
-    var isOriginatingUser = true
+    var isOriginatingUser = false
     
     /**
         Creates Phase10Game, Phase10Deck, and Phase10Card Entities for all the locally created objects in the shared Game Engine

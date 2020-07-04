@@ -53,6 +53,7 @@ class Phase10GamePickerViewController: UIViewController {
     }
     
     @IBAction func newGamePressed(_ sender: UIButton) {
+        Phase10GameEngineManager.shared.isOriginatingUser = true
     }
     
 }

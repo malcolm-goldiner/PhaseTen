@@ -36,14 +36,14 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Pv2-vM-7fS">
-                                <rect key="frame" x="170.5" y="840" width="73" height="30"/>
+                                <rect key="frame" x="170.5" y="816" width="73" height="30"/>
                                 <state key="normal" title="Join Game"/>
                                 <connections>
                                     <action selector="joinGamePressed:" destination="e1o-Ku-iXs" eventType="touchUpInside" id="1Df-Ys-dqJ"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="26c-OA-YFf">
-                                <rect key="frame" x="169.5" y="794" width="75" height="30"/>
+                                <rect key="frame" x="169.5" y="770" width="75" height="30"/>
                                 <state key="normal" title="New Game"/>
                                 <connections>
                                     <action selector="newGamePressed:" destination="e1o-Ku-iXs" eventType="touchUpInside" id="bGU-WE-u6a"/>
@@ -51,7 +51,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sorry, iCloud is required for Phase10" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9s4-Pz-hmj">
-                                <rect key="frame" x="75.5" y="749.5" width="263" height="19.5"/>
+                                <rect key="frame" x="75.5" y="725.5" width="263" height="19.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                 <color key="textColor" systemColor="systemRedColor"/>
                                 <nil key="highlightedColor"/>
@@ -68,7 +68,7 @@
                             <constraint firstItem="Pv2-vM-7fS" firstAttribute="top" secondItem="26c-OA-YFf" secondAttribute="bottom" constant="16" id="Hcr-QP-pOj"/>
                             <constraint firstItem="BR1-KA-jJA" firstAttribute="centerX" secondItem="ZS2-AH-Xcx" secondAttribute="centerX" id="NIk-tR-PSd"/>
                             <constraint firstItem="BR1-KA-jJA" firstAttribute="leading" secondItem="N7T-W9-Mxv" secondAttribute="leading" constant="8" id="Ose-ca-PIE"/>
-                            <constraint firstItem="Pv2-vM-7fS" firstAttribute="bottom" secondItem="N7T-W9-Mxv" secondAttribute="bottom" constant="8" id="cti-s9-odx"/>
+                            <constraint firstItem="N7T-W9-Mxv" firstAttribute="bottom" secondItem="Pv2-vM-7fS" secondAttribute="bottom" constant="16" id="gRX-cZ-rCB"/>
                             <constraint firstItem="BR1-KA-jJA" firstAttribute="centerY" secondItem="ZS2-AH-Xcx" secondAttribute="centerY" id="kjT-iL-1Ni"/>
                             <constraint firstItem="9s4-Pz-hmj" firstAttribute="centerX" secondItem="ZS2-AH-Xcx" secondAttribute="centerX" id="ooj-Rg-pSO"/>
                             <constraint firstItem="Pv2-vM-7fS" firstAttribute="centerX" secondItem="ZS2-AH-Xcx" secondAttribute="centerX" id="ves-88-h1R"/>

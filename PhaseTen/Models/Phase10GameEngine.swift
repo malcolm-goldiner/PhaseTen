@@ -79,14 +79,25 @@ class Phase10GameEngine: Phase10Model {
     
     var winningPlayerIndex: Int?
     
+    var localPlayer: Phase10Player?
+    
     @Published
     var expectedNumberOfPlayers: Int?
     
     private var needsToDealInLocalPlayer: Bool = false {
         didSet {
-            if needsToDealInLocalPlayer,
-                let player = Phase10GameEngine.shared.players.first(where: { $0.isGameOwner }) {
-                Phase10GameEngine.shared.beginRoundForPlayer(player)
+            if needsToDealInLocalPlayer
+            {
+                if Phase10GameEngineManager.shared.isOriginatingUser,
+                   discardPile.isEmpty,
+                   let flippedCard = deck.cards.first {
+                    deck.cards.remove(at: 0)
+                    discardPile.append(flippedCard)
+                }
+                
+                players.forEach { [weak self] in
+                    self?.beginRoundForPlayer($0)
+                }
             }
         }
     }
@@ -97,13 +108,11 @@ class Phase10GameEngine: Phase10Model {
     override init() {
         super.init()
         
-        if let flippedCard = deck.cards.first {
-            deck.cards.remove(at: 0)
-            discardPile.append(flippedCard)
-        }
-        
         let openReqSub = Subscribers.Assign(object: self, keyPath: \.needsToDealInLocalPlayer)
         $openReqs.map { $0 == 0 }.subscribe(openReqSub)
+        
+        let playerWaiting = Subscribers.Assign(object: self, keyPath: \.needsToDealInLocalPlayer)
+        $expectedNumberOfPlayers.map { [weak self] in  $0 == self?.players.count  }.subscribe(playerWaiting)
     }
     
     // MARK: - Game Logic
@@ -175,12 +184,14 @@ class Phase10GameEngine: Phase10Model {
             player.phase = Phase10GameEngine.generalReqs.first
         }
         
-        if Phase10GameEngineManager.shared.isOriginatingUser {
+        if shouldDeal() {
             player.hand.append(contentsOf: deck.cards[0...9])
             deck.cards.removeSubrange(0...9)
-        } else {
-            
         }
+    }
+    
+    private func shouldDeal() -> Bool {
+        return Phase10GameEngineManager.shared.isOriginatingUser && players.count == expectedNumberOfPlayers
     }
     
     func isPhaseCleared(for player: Phase10Player,
@@ -285,7 +296,7 @@ class Phase10GameEngine: Phase10Model {
         let pred = NSPredicate(format: "\(Phase10Deck.Key.game) == %@", reference)
         let query = CKQuery(recordType: Phase10Deck.recordType, predicate: pred)
         openReqs += 1
-        CKContainer.default().publicCloudDatabase.perform(query, inZoneWith: nil) { (records, error) in
+        CKContainer.default().publicCloudDatabase.perform(query, inZoneWith: nil) { [weak self] (records, error) in
             records?.forEach { [weak self] record in
                 self?.openReqs -= 1
                 self?.deck.recordID = record.recordID
@@ -296,8 +307,8 @@ class Phase10GameEngine: Phase10Model {
             }
             
             // when all the cards in the deck are loaded we can deal
-            if let player = Phase10GameEngine.shared.players.first(where: { $0.isGameOwner }) {
-                 Phase10GameEngine.shared.beginRoundForPlayer(player)
+            if let player = self?.players.first(where: { $0.isGameOwner }) {
+                self?.beginRoundForPlayer(player)
             }
         }
     }
