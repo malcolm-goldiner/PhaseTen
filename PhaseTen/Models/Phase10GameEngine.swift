@@ -110,6 +110,23 @@ class Phase10GameEngine: Phase10Model {
                     self?.beginRoundForPlayer($0)
                 }
             }
+            
+            let gameManager = Phase10GameEngineManager.shared
+            
+            if gameManager.isGameOwner,
+               discardPile.isEmpty,
+               let flippedCard = deck.cards.first,
+               let recordID = flippedCard.recordID {
+                deck.cards.remove(at: 0)
+                discardPile.append(flippedCard)
+                
+                // Cards in the discard pile have to deck reference associated with them, they're in a list of Card References called discard on the game object
+                let record = CKRecord(recordType: Phase10Card.recordType, recordID: recordID)
+                record[.deck] = nil
+                save(record: record)
+                
+                gameManager.saveDiscardPile()
+            }
         }
     }
     
@@ -133,13 +150,6 @@ class Phase10GameEngine: Phase10Model {
     /// Initializes Game Engine and listens for all the cards and other plays to join and/or be downloaded from CloudKit before adding the first card to the discard pile from the deck and dealing in all players
     override init() {
         super.init()
-        
-        if Phase10GameEngineManager.shared.isGameOwner,
-           discardPile.isEmpty,
-           let flippedCard = deck.cards.first {
-            deck.cards.remove(at: 0)
-            discardPile.append(flippedCard)
-        }
         
         let openReqSub = Subscribers.Assign(object: self, keyPath: \.needToDeal)
         $openReqs.combineLatest($expectedNumberOfPlayers).map { [weak self] (reqs, expectedPlayers) in reqs == 0 && expectedPlayers == self?.players.count }.subscribe(openReqSub)
@@ -378,18 +388,18 @@ class Phase10GameEngine: Phase10Model {
      */
     func card(from record: CKRecord) -> Phase10Card? {
         if let description = record[.description] as? String {
-            let cardDesc = CardDescriptor(desc: "hand \(description)")
+            let cardDesc = CardDescriptor(desc: "\(description) hand ")
             
             if let type = cardDesc?.type,
                 let color = cardDesc?.color {
-                let card = Phase10Card(type, color: color)
+                let card = Phase10Card(type, color: color, recordID: record.recordID)
                 
                 if let placeIndex = record[.placeIndex] as? Int {
                     card.placeIndex = placeIndex
                 }
                 
                 
-                return Phase10Card(type, color: color)
+                return Phase10Card(type, color: color, recordID: record.recordID)
             }
         }
         return nil

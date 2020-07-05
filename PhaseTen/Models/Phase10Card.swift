@@ -94,9 +94,12 @@ class Phase10Card: Phase10Model, Hashable, Equatable {
         return desc
     }
     
-    init(_ type: Phase10CardType, color: UIColor? = nil) {
+    init(_ type: Phase10CardType, color: UIColor? = nil, recordID: CKRecord.ID? = nil) {
         self.type = type
         self.color = color ?? .black // default for wild and skip
+        
+        super.init()
+        self.recordID = recordID
     }
     
     func hash(into hasher: inout Hasher) {

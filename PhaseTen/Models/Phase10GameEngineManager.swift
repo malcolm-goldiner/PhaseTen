@@ -112,14 +112,6 @@ class Phase10GameEngineManager {
         }
     }
     
-    public func saveFirstCard() {
-        // save first card in discard pile
-        if let firstCard = Phase10GameEngine.shared.discardPile.first {
-            let record = CKRecord(recordType: Phase10Card.recordType)
-            firstCard.save(record: record)
-        }
-    }
-    
     public func listenToScoreChanges(onLabel scoreLabel: UILabel, forPlayer player: Phase10Player) {
         let scoreSubscriber = Subscribers.Assign(object: scoreLabel, keyPath: \.text)
         Phase10GameEngine.shared.$scoresByPlayer.map { scoreDict in

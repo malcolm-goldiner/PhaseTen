@@ -116,10 +116,6 @@ class Phase10GameViewController: UIViewController {
             }
         }
         
-        if gameManager.isGameOwner {
-             gameManager.saveFirstCard()
-        }
-        
         let handSubscriber = Subscribers.Assign(object: self, keyPath: \.needsReload)
         player.$hand.map { !$0.isEmpty }.subscribe(handSubscriber)
         

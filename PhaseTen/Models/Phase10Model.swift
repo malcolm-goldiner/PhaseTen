@@ -21,9 +21,9 @@ class Phase10Model {
                 print(Phase10Error.auth.rawValue)
             } else if error != nil {
                 print(Phase10Error.unknown.rawValue)
-            } else {
-                print("Saved \(String(describing: record?.recordType))")
-                self?.recordID = record?.recordID
+            } else if let record = record {
+                print("Saved \(String(describing: record.recordType))")
+                self?.recordID = record.recordID
             }
         }
     }
