@@ -60,7 +60,7 @@ enum Phase: Equatable, Hashable {
             return ""
         }
         
-        return requirements.reduce("") { $0 + $1.description() }
+        return requirements.reduce("") { $0 + "-" + $1.description() }
     }
     
     func hash(into hasher: inout Hasher) {

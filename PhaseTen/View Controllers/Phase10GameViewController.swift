@@ -53,7 +53,7 @@ class Phase10GameViewController: UIViewController {
         }
     }
     
-    var player: Phase10Player? {
+    var player: Phase10Player? = Phase10GameEngine.shared.localPlayer {
         didSet {
             reloadCards()
         }
@@ -74,6 +74,7 @@ class Phase10GameViewController: UIViewController {
         
         startGame()
         listenForGameStateChanges()
+        listenForDatabaseChanges()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -98,7 +99,7 @@ class Phase10GameViewController: UIViewController {
         
         gameManager.listenToScoreChanges(onLabel: scoreLabel, forPlayer: player)
         
-        if gameManager.isOriginatingUser {
+        if gameManager.isGameOwner {
             _ = Phase10GameEngine.shared.$discardPile.sink { [weak self] _ in
                 self?.gameManager.saveDiscardPile()
             }
@@ -115,7 +116,7 @@ class Phase10GameViewController: UIViewController {
             }
         }
         
-        if gameManager.isOriginatingUser {
+        if gameManager.isGameOwner {
              gameManager.saveFirstCard()
         }
         
@@ -139,7 +140,59 @@ class Phase10GameViewController: UIViewController {
         
         let inviteSub = Subscribers.Assign(object: self, keyPath: \.needsReload)
         Phase10GameEngine.shared.$expectedNumberOfPlayers.map { $0 != nil }.subscribe(inviteSub)
+        
+        let phaseSub = Subscribers.Assign(object: topPotentialComboLabel, keyPath: \.text)
+        player.$phase.map { String($0?.description().split(separator: "-").first ?? "") }.subscribe(phaseSub)
+        
+        
+        let phaseSub2 = Subscribers.Assign(object: bottomPotentialComboLabel, keyPath: \.text)
+        player.$phase.map { String($0?.description().split(separator: "-").last ?? "") }.subscribe(phaseSub2)
     }
+    
+    private func listenForDatabaseChanges() {
+        guard let gameRecord = Phase10GameEngineManager.shared.gameRecord,
+              let deckRecordID = Phase10GameEngine.shared.deck.recordID else {
+            return
+        }
+        
+        UIApplication.shared.registerForRemoteNotifications()
+        
+        subscription(for: Phase10GameEngine.recordType)
+        
+        let gamePredicate = NSPredicate(format: "game == %@", gameRecord)
+        let deckRecord = CKRecord(recordType: Phase10Deck.recordType, recordID: deckRecordID)
+        
+        subscription(for: Phase10Card.recordType, with: NSPredicate(format: "deck == %@", deckRecord))
+        subscription(for: Phase10Player.recordType, with: gamePredicate)
+        subscription(for: Phase10Deck.recordType, with: gamePredicate)
+    }
+    
+    private func subscription(for recordType: String, with predicate: NSPredicate = NSPredicate(value: true)) {
+        let subscription = CKQuerySubscription(recordType: recordType,
+                                               predicate: predicate,
+                                               options: [.firesOnRecordUpdate])
+        
+        let info = CKSubscription.NotificationInfo()
+        info.alertLocalizationKey = "\(recordType)_changed_alert"
+        subscription.notificationInfo = info
+                                                
+        
+        saveSubscription(subscription)
+    }
+    
+    private func saveSubscription(_ subscription: CKQuerySubscription) {
+        CKContainer.default().publicCloudDatabase.save(subscription) { [weak self] savedSubscription, error in
+            guard let savedSubscription = savedSubscription, error == nil else {
+                // awesome error handling
+                return
+            }
+            
+            // subscription saved successfully
+            // (probably want to save the subscriptionID in user defaults or something)
+        }
+    }
+    
+    
     
     private func validatePhase(withSets combinedSets: [[Phase10Card]], forPlayer player: Phase10Player) {
         let cleared = Phase10GameEngine.shared.validatePhase(for: player, playedCards: combinedSets)
@@ -155,11 +208,11 @@ class Phase10GameViewController: UIViewController {
             present(alertController, animated: true, completion: nil)
         }
     }
-
+    
     private func startGame() {
         // what if the players are still being loaded in?
         Phase10GameEngine.shared.addPlayer()
-        player = Phase10GameEngine.shared.players.first(where: { $0.isGameOwner })
+        
         handDataSource = Phase10GameViewDataSource(deckType: .hand, game: Phase10GameEngine.shared)
         setDataSource = Phase10GameViewDataSource(deckType: .set(order: .top), game: Phase10GameEngine.shared)
         secondSetDataSource = Phase10GameViewDataSource(deckType: .set(order: .bottom), game: Phase10GameEngine.shared)
@@ -167,7 +220,7 @@ class Phase10GameViewController: UIViewController {
        
         
         // If we are joining a game already in progress we don't need to do this
-        if gameManager.isOriginatingUser == true {
+        if gameManager.isGameOwner == true {
             gameManager.persistGame()
             
             // This could come through before it has been saved
@@ -199,12 +252,6 @@ class Phase10GameViewController: UIViewController {
         }
         
         setupCollectionViews()
-        
-        if let phase = player?.phase {
-            let splitDesc = phase.description().split(separator: " ")
-            topPotentialComboLabel.text = splitDesc.first?.description
-            bottomPotentialComboLabel.text = splitDesc.last?.description
-        }
     }
     
     private func setupCollectionViews() {

@@ -39,7 +39,7 @@ class Phase10GamePickerViewController: UIViewController {
     }
     
     @IBAction func joinGamePressed(_ sender: UIButton) {
-        guard let id = gameIDTextField.text else {
+        guard let id = gameIDTextField.text, !id.isEmpty else {
             return
         }
         
@@ -47,13 +47,11 @@ class Phase10GamePickerViewController: UIViewController {
         Phase10GameEngine.shared.loadPlayers(for: id)
         Phase10GameEngine.shared.loadDeck(for: id)
         
-        Phase10GameEngineManager.shared.isOriginatingUser = false 
-        
         performSegue(withIdentifier: "beginGameSegue", sender: nil)
     }
     
     @IBAction func newGamePressed(_ sender: UIButton) {
-        Phase10GameEngineManager.shared.isOriginatingUser = true
+        Phase10GameEngineManager.shared.areCreatingNewGame = true 
     }
     
 }

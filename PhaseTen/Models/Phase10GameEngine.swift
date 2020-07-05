@@ -84,17 +84,10 @@ class Phase10GameEngine: Phase10Model {
     @Published
     var expectedNumberOfPlayers: Int?
     
-    private var needsToDealInLocalPlayer: Bool = false {
+    private var needToDeal: Bool = false {
         didSet {
-            if needsToDealInLocalPlayer
+            if needToDeal && Phase10GameEngineManager.shared.isGameOwner
             {
-                if Phase10GameEngineManager.shared.isOriginatingUser,
-                   discardPile.isEmpty,
-                   let flippedCard = deck.cards.first {
-                    deck.cards.remove(at: 0)
-                    discardPile.append(flippedCard)
-                }
-                
                 players.forEach { [weak self] in
                     self?.beginRoundForPlayer($0)
                 }
@@ -104,15 +97,19 @@ class Phase10GameEngine: Phase10Model {
     
     // MARK: - Initailzers
     
-    /// Initializes Game Engine and adds the first card to the discard pile
+    /// Initializes Game Engine and listens for all the cards and other plays to join and/or be downloaded from CloudKit before adding the first card to the discard pile from the deck and dealing in all players
     override init() {
         super.init()
         
-        let openReqSub = Subscribers.Assign(object: self, keyPath: \.needsToDealInLocalPlayer)
-        $openReqs.map { $0 == 0 }.subscribe(openReqSub)
+        if Phase10GameEngineManager.shared.isGameOwner,
+           discardPile.isEmpty,
+           let flippedCard = deck.cards.first {
+            deck.cards.remove(at: 0)
+            discardPile.append(flippedCard)
+        }
         
-        let playerWaiting = Subscribers.Assign(object: self, keyPath: \.needsToDealInLocalPlayer)
-        $expectedNumberOfPlayers.map { [weak self] in  $0 == self?.players.count  }.subscribe(playerWaiting)
+        let openReqSub = Subscribers.Assign(object: self, keyPath: \.needToDeal)
+        $openReqs.combineLatest($expectedNumberOfPlayers).map { [weak self] (reqs, expectedPlayers) in reqs == 0 && expectedPlayers == self?.players.count }.subscribe(openReqSub)
     }
     
     // MARK: - Game Logic
@@ -120,7 +117,7 @@ class Phase10GameEngine: Phase10Model {
     /**
         Moves players in Phase 1...8 to the next phase, ends the game for a player on phase 9
      
-        Parameter player: Player object that needs to advance
+        - Parameter player: the player who will be moved to the next Phase
      */
     func movePlayerToNextPhase(_ player: Phase10Player) {
         if let phase = player.phase {
@@ -173,10 +170,11 @@ class Phase10GameEngine: Phase10Model {
             return
         }
         
-        let newPlayer = Phase10Player(name: "default-name", phase: 0, index: players.count)
+        // we may need to know whether all players are loaded here to see if this count index will be right
+        // we should be able to get the users name from iCloud
+        let newPlayer = Phase10Player(name: "default-name", phase: 0, index: Phase10GameEngineManager.shared.isGameOwner ? 0 : players.count)
+        Phase10GameEngine.shared.localPlayer = newPlayer
         players.append(newPlayer)
-        beginRoundForPlayer(newPlayer)
-        newPlayer.isGameOwner = true
     }
     
     private func beginRoundForPlayer(_ player: Phase10Player) {
@@ -191,7 +189,7 @@ class Phase10GameEngine: Phase10Model {
     }
     
     private func shouldDeal() -> Bool {
-        return Phase10GameEngineManager.shared.isOriginatingUser && players.count == expectedNumberOfPlayers
+        return Phase10GameEngineManager.shared.isGameOwner && players.count == expectedNumberOfPlayers
     }
     
     func isPhaseCleared(for player: Phase10Player,
@@ -248,6 +246,7 @@ class Phase10GameEngine: Phase10Model {
         CKContainer.default().publicCloudDatabase.fetch(withRecordID: reference.recordID) { [weak self] (record, error) in
             self?.recordID = record?.recordID
             
+            // is this order constant
             if let turnIndex = record?[.turnIndex] as? Int {
                 self?.turnIndex = turnIndex
             }

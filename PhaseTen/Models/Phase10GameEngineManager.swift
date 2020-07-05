@@ -20,7 +20,15 @@ class Phase10GameEngineManager {
     
     var gameRecord: CKRecord?
     
-    var isOriginatingUser = false
+    private var isOriginatingUser: Bool {
+        return gameRecord?.creatorUserRecordID?.recordName == CKCurrentUserDefaultName
+    }
+    
+    var areCreatingNewGame = false
+    
+    var isGameOwner: Bool {
+        return areCreatingNewGame || isOriginatingUser
+    }
     
     /**
         Creates Phase10Game, Phase10Deck, and Phase10Card Entities for all the locally created objects in the shared Game Engine
